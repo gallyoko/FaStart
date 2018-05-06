@@ -1,0 +1,2 @@
+# FaStart
+Simple Android App
