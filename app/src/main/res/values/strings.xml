@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FaStart</string>
+    <string name="widget_name">Gally</string>
+    <string name="widget_button_light">Lumière</string>
+</resources>
