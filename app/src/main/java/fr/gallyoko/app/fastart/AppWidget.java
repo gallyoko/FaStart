@@ -11,16 +11,19 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-import android.content.DialogInterface;
-import android.app.AlertDialog;
 
-public class ButtonWidget extends AppWidgetProvider {
+
+/**
+ * Implementation of App Widget functionality.
+ */
+public class AppWidget extends AppWidgetProvider {
     private final static String EXTRA_ACTIVE = "extraActive";
     private final static String EXTRA_FIRST_LAUNCH = "extraFirstLaunch";
     private boolean active = false;
     private boolean firstLaunch = true;
     private String textButton = "ON";
     private Integer backgroundButton = Color.GREEN;
+
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -30,13 +33,13 @@ public class ButtonWidget extends AppWidgetProvider {
         final int length = appWidgetIds.length;
         for (int i = 0 ; i < length ; i++) {
             // Gestion de la vue
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.button_widget);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
             // et du bouton
             views.setTextViewText(R.id.light, textButton);
             views.setInt(R.id.light, "setBackgroundColor", backgroundButton);
 
             // gestion de l'action
-            Intent testIntent = new Intent(context, ButtonWidget.class);
+            Intent testIntent = new Intent(context, AppWidget.class);
             // On veut que l'intent lance la mise à jour
             testIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 
@@ -63,46 +66,39 @@ public class ButtonWidget extends AppWidgetProvider {
     }
 
     @Override
+    public void onEnabled(Context context) {
+        // Enter relevant functionality for when the first widget is created
+    }
+
+    @Override
     public void onReceive(Context context, Intent intent) {
-        Boolean extraFirstLaunch = intent.getBooleanExtra(EXTRA_FIRST_LAUNCH, true);
-        Boolean extraActive = intent.getBooleanExtra(EXTRA_ACTIVE, false);
-        if (!this.isConnected(context)) {
-            Toast.makeText(context, "Aucune connexion à internet.", Toast.LENGTH_SHORT).show();
-        } else {
-            if (!extraFirstLaunch) {
-                String url = "http://172.20.0.2:8091/api/light/put/on/2";
-                String messageSuccess = "Lumière allumée.";
-                if (extraActive) {
-                    url = "http://172.20.0.2:8091/api/light/put/off/2";
-                    messageSuccess = "Lumière éteinte.";
-                    active = false;
-                    textButton = "ON";
-                    backgroundButton = Color.GREEN;
-                } else {
-                    active = true;
-                    textButton = "OFF";
-                    backgroundButton = Color.RED;
-                }
-                FetchTask fetchTask = new FetchTask();
-                fetchTask.context = context;
-                fetchTask.messageSuccess = messageSuccess;
-                fetchTask.execute(url);
+        if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+            Boolean extraFirstLaunch = intent.getBooleanExtra(EXTRA_FIRST_LAUNCH, true);
+            Boolean extraActive = intent.getBooleanExtra(EXTRA_ACTIVE, false);
+            if (!this.isConnected(context)) {
+                Toast.makeText(context, "Aucune connexion à internet.", Toast.LENGTH_SHORT).show();
             } else {
-                /*AlertDialog alertDialog = new AlertDialog.Builder(context).create(); //Read Update
-                alertDialog.setTitle("hi");
-                alertDialog.setMessage("this is my app");
-
-                alertDialog.setButton("Continue..", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // here you can add functions
+                if (!extraFirstLaunch) {
+                    String url = "http://172.20.0.2:8091/api/light/put/on/2";
+                    String messageSuccess = "Lumière allumée.";
+                    if (extraActive) {
+                        url = "http://172.20.0.2:8091/api/light/put/off/2";
+                        messageSuccess = "Lumière éteinte.";
+                        active = false;
+                        textButton = "ON";
+                        backgroundButton = Color.GREEN;
+                    } else {
+                        active = true;
+                        textButton = "OFF";
+                        backgroundButton = Color.RED;
                     }
-                });
-
-                alertDialog.show();  //<-- See This!
-                */
-                Toast.makeText(context, "Fais un choix.", Toast.LENGTH_SHORT).show();
+                    FetchTask fetchTask = new FetchTask();
+                    fetchTask.context = context;
+                    fetchTask.messageSuccess = messageSuccess;
+                    fetchTask.execute(url);
+                }
+                firstLaunch = false;
             }
-            firstLaunch = false;
         }
 
         // On revient au traitement naturel du Receiver, qui va lancer onUpdate s'il y a demande de mise à jour
@@ -116,5 +112,11 @@ public class ButtonWidget extends AppWidgetProvider {
         return networkInfo != null && networkInfo.isConnected();
     }
 
+    @Override
+    public void onDisabled(Context context) {
+        Toast.makeText(context, "Suppression.", Toast.LENGTH_SHORT).show();
+        // Enter relevant functionality for when the last widget is disabled
+    }
 }
+
 
