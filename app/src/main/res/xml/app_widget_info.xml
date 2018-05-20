@@ -3,9 +3,9 @@
     android:minWidth="40dp"
     android:minHeight="20dp"
     android:updatePeriodMillis="86400000"
-    android:initialLayout="@layout/app_widget"
+    android:initialLayout="@layout/app_widget_button"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen|keyguard"
-    android:initialKeyguardLayout="@layout/app_widget"
+    android:initialKeyguardLayout="@layout/app_widget_button"
     android:configure="fr.gallyoko.app.fastart.DialogActivity">
 </appwidget-provider>

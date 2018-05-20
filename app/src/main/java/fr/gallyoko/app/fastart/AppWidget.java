@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,18 +14,19 @@ import android.net.Uri;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-
 /**
  * Implementation of App Widget functionality.
  */
 public class AppWidget extends AppWidgetProvider {
+
     private final static String EXTRA_ACTIVE = "extraActive";
     private final static String EXTRA_FIRST_LAUNCH = "extraFirstLaunch";
     private boolean active = false;
     private boolean firstLaunch = true;
     private String textButton = "ON";
+    private String textToggle = "ALLUME";
     private Integer backgroundButton = Color.GREEN;
-
+    private Integer backgroundToggle = Color.BLUE;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -33,48 +36,48 @@ public class AppWidget extends AppWidgetProvider {
         final int length = appWidgetIds.length;
         for (int i = 0 ; i < length ; i++) {
             // Gestion de la vue
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
             // et du bouton
-            views.setTextViewText(R.id.light, textButton);
-            views.setInt(R.id.light, "setBackgroundColor", backgroundButton);
-
-            // gestion de l'action
-            Intent testIntent = new Intent(context, AppWidget.class);
-            // On veut que l'intent lance la mise à jour
-            testIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-
-            // On n'oublie pas les identifiants
-            testIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-
-            // On rajoute les éléments à envoyer à l'intent
-            testIntent.putExtra(EXTRA_ACTIVE, this.active);
-            testIntent.putExtra(EXTRA_FIRST_LAUNCH, this.firstLaunch);
-
-            // Les données inutiles mais qu'il faut rajouter
-            Uri data = Uri.withAppendedPath(Uri.parse("WIDGET://widget/id/"), String.valueOf(R.id.light));
-            testIntent.setData(data);
-
-            // On insère l'intent dans un PendingIntent
-            PendingIntent testPending = PendingIntent.getBroadcast(context, 0, testIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            // Et on l'associe à l'activation du bouton
-            views.setOnClickPendingIntent(R.id.light, testPending);
-
-            // Et il faut mettre à jour toutes les vues
-            appWidgetManager.updateAppWidget(appWidgetIds[i], views);
+            views.setTextViewText(R.id.light1, textButton);
+            views.setInt(R.id.light1, "setBackgroundColor", backgroundButton);
+            // pass appWidgetId to the click handler
+            views.setOnClickPendingIntent(R.id.light1, buildButtonPendingIntent(context, appWidgetIds[i],
+                    this.active, this.firstLaunch));
+            // pass appWidgetId to the update method
+            pushWidgetUpdate(context, views, appWidgetIds[i]);
         }
     }
 
-    @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
+    public static void pushWidgetUpdate(Context context, RemoteViews remoteViews, int appWidgetId) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+        manager.updateAppWidget(appWidgetId, remoteViews);
+
+    }
+
+    public static PendingIntent buildButtonPendingIntent(Context context, int appWidgetId,
+                                                         boolean active, boolean firstLaunch) {
+        Intent intent = new Intent();
+        // put the appWidgetId as an extra to the update intent
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+
+        intent.putExtra(EXTRA_ACTIVE, active);
+        intent.putExtra(EXTRA_FIRST_LAUNCH, firstLaunch);
+
+        return PendingIntent.getBroadcast(context, appWidgetId, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+            Integer widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            String value = prefs.getString("type_" + widgetId, null);
             Boolean extraFirstLaunch = intent.getBooleanExtra(EXTRA_FIRST_LAUNCH, true);
             Boolean extraActive = intent.getBooleanExtra(EXTRA_ACTIVE, false);
+
             if (!this.isConnected(context)) {
                 Toast.makeText(context, "Aucune connexion à internet.", Toast.LENGTH_SHORT).show();
             } else {
@@ -87,10 +90,24 @@ public class AppWidget extends AppWidgetProvider {
                         active = false;
                         textButton = "ON";
                         backgroundButton = Color.GREEN;
+                        if (value.equals("button")) {
+                            textButton = "ON";
+                            backgroundButton = Color.GREEN;
+                        } else if (value.equals("toggle")) {
+                            textToggle = "ALLUMER";
+                            backgroundToggle = Color.BLUE;
+                        }
                     } else {
                         active = true;
                         textButton = "OFF";
                         backgroundButton = Color.RED;
+                        if (value.equals("button")) {
+                            textButton = "OFF";
+                            backgroundButton = Color.RED;
+                        } else if (value.equals("toggle")) {
+                            textToggle = "ETEINDRE";
+                            backgroundToggle = Color.YELLOW;
+                        }
                     }
                     FetchTask fetchTask = new FetchTask();
                     fetchTask.context = context;
@@ -98,6 +115,7 @@ public class AppWidget extends AppWidgetProvider {
                     fetchTask.execute(url);
                 }
                 firstLaunch = false;
+                this.updateWidgetPictureAndButtonListener(context, widgetId, active, firstLaunch);
             }
         }
 
@@ -105,17 +123,28 @@ public class AppWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
     }
 
+    private void updateWidgetPictureAndButtonListener(Context context, int appWidgetId, boolean active, boolean firstLaunch) {
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String value = prefs.getString("type_" + appWidgetId, null);
+        if (value != null) {
+            if (value.equals("button")) {
+                views.setTextViewText(R.id.light1, textButton);
+                views.setInt(R.id.light1, "setBackgroundColor", backgroundButton);
+            } else if (value.equals("toggle")) {
+                views.setTextViewText(R.id.light1, textToggle);
+                views.setInt(R.id.light1, "setBackgroundColor", backgroundToggle);
+            }
+            views.setOnClickPendingIntent(R.id.light1, AppWidget.buildButtonPendingIntent(context, appWidgetId, active, firstLaunch));
+            AppWidget.pushWidgetUpdate(context, views, appWidgetId);
+        }
+    }
+
     private boolean isConnected(Context context) {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        Toast.makeText(context, "Suppression.", Toast.LENGTH_SHORT).show();
-        // Enter relevant functionality for when the last widget is disabled
     }
 }
 
