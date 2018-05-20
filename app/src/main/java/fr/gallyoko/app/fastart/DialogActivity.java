@@ -68,21 +68,28 @@ public class DialogActivity extends Activity {
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(getDialogContext());
-                widgetTypeRepository.open();
-                WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(widgetTypes.get(which).getId());
-                widgetTypeRepository.close();
-
-                ApiRepository apiRepository = new ApiRepository(getDialogContext());
-                apiRepository.open();
-                ApiEntity apiEntity = apiRepository.getById(1);
-                apiRepository.close();
-
                 WidgetRepository widgetRepository = new WidgetRepository(getDialogContext());
                 widgetRepository.open();
                 if (widgetRepository.getByAppWidgetId(mAppWidgetId) == null) {
+                    WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(getDialogContext());
+                    widgetTypeRepository.open();
+                    WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(widgetTypes.get(which).getId());
+                    widgetTypeRepository.close();
+
+                    ApiRepository apiRepository = new ApiRepository(getDialogContext());
+                    apiRepository.open();
+                    ApiEntity apiEntity = null;
+                    String titleWidget = "";
+                    if (widgetTypes.get(which).getName().equals("button")) {
+                        apiEntity = apiRepository.getById(1);
+                        titleWidget = "Lumière salon";
+                    } else if (widgetTypes.get(which).getName().equals("toggle")) {
+                        apiEntity = apiRepository.getById(2);
+                        titleWidget = "Lumière TV";
+                    }
+                    apiRepository.close();
                     WidgetEntity widgetEntity = new WidgetEntity(mAppWidgetId,
-                            "Lumière salon", widgetTypeEntity, apiEntity);
+                            titleWidget, widgetTypeEntity, apiEntity);
                     widgetRepository.insert(widgetEntity);
                 }
                 widgetRepository.close();
@@ -140,9 +147,16 @@ public class DialogActivity extends Activity {
         apiRepository.open();
         if (apiRepository.getByName("lumière salon") == null) {
             ApiEntity apiEntity = new ApiEntity("lumière salon",
-                    "Allume ou éteind la petite lumière du salon",
-                    "http://172.20.0.2:8091/api/light", "/put/on/2", "Lumière allumée.",
-                    "/put/off/2", "Lumière éteinte.");
+                    "Allume ou éteind l'halogène du salon",
+                    "http://172.20.0.2:8091/api/light", "/put/on/1", "Lumière salon allumée.",
+                    "/put/off/1", "Lumière salon éteinte.");
+            apiRepository.insert(apiEntity);
+        }
+        if (apiRepository.getByName("lumière TV") == null) {
+            ApiEntity apiEntity = new ApiEntity("lumière salon",
+                    "Allume ou éteind la petite lumière TV du salon",
+                    "http://172.20.0.2:8091/api/light", "/put/on/2", "Lumière TV allumée.",
+                    "/put/off/2", "Lumière TV éteinte.");
             apiRepository.insert(apiEntity);
         }
         apiRepository.close();
