@@ -15,8 +15,12 @@ import android.appwidget.AppWidgetManager;
 
 import java.util.ArrayList;
 
+import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetTypeEntity;
+import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
+import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
 import fr.gallyoko.app.fastart.bdd.repository.WidgetTypeRepository;
+import fr.gallyoko.app.fastart.bdd.repository.ApiRepository;
 
 public class DialogActivity extends Activity {
 
@@ -47,16 +51,10 @@ public class DialogActivity extends Activity {
 
         builder.setTitle("Choose an type");
 
+        this.updateConfig();
+
         WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(getDialogContext());
         widgetTypeRepository.open();
-        if (widgetTypeRepository.getByName("button") == null) {
-            WidgetTypeEntity widgetTypeEntity1 = new WidgetTypeEntity("button");
-            widgetTypeRepository.insert(widgetTypeEntity1);
-        }
-        if (widgetTypeRepository.getByName("toggle") == null) {
-            WidgetTypeEntity widgetTypeEntity2 = new WidgetTypeEntity("toggle");
-            widgetTypeRepository.insert(widgetTypeEntity2);
-        }
         final ArrayList<WidgetTypeEntity> widgetTypes = widgetTypeRepository.getAll();
         widgetTypeRepository.close();
 
@@ -70,6 +68,24 @@ public class DialogActivity extends Activity {
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(getDialogContext());
+                widgetTypeRepository.open();
+                WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(widgetTypes.get(which).getId());
+                widgetTypeRepository.close();
+
+                ApiRepository apiRepository = new ApiRepository(getDialogContext());
+                apiRepository.open();
+                ApiEntity apiEntity = apiRepository.getById(1);
+                apiRepository.close();
+
+                WidgetRepository widgetRepository = new WidgetRepository(getDialogContext());
+                widgetRepository.open();
+                if (widgetRepository.getByAppWidgetId(mAppWidgetId) == null) {
+                    WidgetEntity widgetEntity = new WidgetEntity(mAppWidgetId,
+                            "Lumière salon", widgetTypeEntity, apiEntity);
+                    widgetRepository.insert(widgetEntity);
+                }
+                widgetRepository.close();
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getDialogContext());
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("type_" + mAppWidgetId, widgetTypes.get(which).getName());
@@ -105,5 +121,30 @@ public class DialogActivity extends Activity {
         }
 
         return context;
+    }
+
+    private void updateConfig() {
+        WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(getDialogContext());
+        widgetTypeRepository.open();
+        if (widgetTypeRepository.getByName("button") == null) {
+            WidgetTypeEntity widgetTypeEntity1 = new WidgetTypeEntity("button");
+            widgetTypeRepository.insert(widgetTypeEntity1);
+        }
+        if (widgetTypeRepository.getByName("toggle") == null) {
+            WidgetTypeEntity widgetTypeEntity2 = new WidgetTypeEntity("toggle");
+            widgetTypeRepository.insert(widgetTypeEntity2);
+        }
+        widgetTypeRepository.close();
+
+        ApiRepository apiRepository = new ApiRepository(getDialogContext());
+        apiRepository.open();
+        if (apiRepository.getByName("lumière salon") == null) {
+            ApiEntity apiEntity = new ApiEntity("lumière salon",
+                    "Allume ou éteind la petite lumière du salon",
+                    "http://172.20.0.2:8091/api/light", "/put/on/2", "Lumière allumée.",
+                    "/put/off/2", "Lumière éteinte.");
+            apiRepository.insert(apiEntity);
+        }
+        apiRepository.close();
     }
 }

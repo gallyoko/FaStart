@@ -13,6 +13,9 @@ import android.net.NetworkInfo;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
+import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
+
 /**
  * Implementation of App Widget functionality.
  */
@@ -23,7 +26,7 @@ public class AppWidget extends AppWidgetProvider {
     private boolean active = false;
     private boolean firstLaunch = true;
     private String textButton = "ON";
-    private String textToggle = "ALLUME";
+    private String textToggle = "ALLUMER";
     private Integer backgroundButton = Color.GREEN;
     private Integer backgroundToggle = Color.BLUE;
 
@@ -74,11 +77,16 @@ public class AppWidget extends AppWidgetProvider {
                 Toast.makeText(context, "Aucune connexion à internet.", Toast.LENGTH_SHORT).show();
             } else {
                 if (!extraFirstLaunch) {
-                    String url = "http://172.20.0.2:8091/api/light/put/on/2";
-                    String messageSuccess = "Lumière allumée.";
+                    WidgetRepository widgetRepository = new WidgetRepository(context);
+                    widgetRepository.open();
+                    WidgetEntity widget = widgetRepository.getByAppWidgetId(widgetId);
+                    widgetRepository.close();
+
+                    String url = widget.getApi().getUrl() + widget.getApi().getPutOn();
+                    String messageSuccess = widget.getApi().getPutOnMsg();
                     if (extraActive) {
-                        url = "http://172.20.0.2:8091/api/light/put/off/2";
-                        messageSuccess = "Lumière éteinte.";
+                        url = widget.getApi().getUrl() + widget.getApi().getPutOff();
+                        messageSuccess = widget.getApi().getPutOffMsg();
                         active = false;
                         textButton = "ON";
                         backgroundButton = Color.GREEN;
@@ -115,10 +123,10 @@ public class AppWidget extends AppWidgetProvider {
     }
 
     private void updateWidgetTypeListener(Context context, int appWidgetId, boolean active, boolean firstLaunch) {
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String value = prefs.getString("type_" + appWidgetId, null);
         if (value != null) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
             if (value.equals("button")) {
                 views.setTextViewText(R.id.light1, textButton);
                 views.setInt(R.id.light1, "setBackgroundColor", backgroundButton);

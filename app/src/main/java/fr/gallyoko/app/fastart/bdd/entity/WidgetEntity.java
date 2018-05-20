@@ -3,23 +3,34 @@ package fr.gallyoko.app.fastart.bdd.entity;
 public class WidgetEntity {
 
     private int id;
+    private int appWidgetId;
     private String title;
     private WidgetTypeEntity type;
-
+    private ApiEntity api;
 
     public WidgetEntity(){}
 
-    public WidgetEntity(String title, WidgetTypeEntity type){
+    public WidgetEntity(int appWidgetId, String title, WidgetTypeEntity type, ApiEntity api){
+        this.appWidgetId = appWidgetId;
         this.title = title;
         this.type = type;
+        this.api = api;
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getAppWidgetId() {
+        return this.appWidgetId;
+    }
+
+    public void setAppWidgetId(int appWidgetId) {
+        this.appWidgetId = appWidgetId;
     }
 
     public String getTitle() {
@@ -38,7 +49,11 @@ public class WidgetEntity {
         this.type = type;
     }
 
-    public String toString(){
-        return "ID : "+id+"\nTitle : "+this.title+"\nType : "+this.type;
+    public ApiEntity getApi() {
+        return this.api;
+    }
+
+    public void setApi(ApiEntity api) {
+        this.api = api;
     }
 }
