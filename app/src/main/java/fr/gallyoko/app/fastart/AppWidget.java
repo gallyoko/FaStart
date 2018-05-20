@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -32,18 +31,13 @@ public class AppWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
-        // Petite astuce : permet de garder la longueur du tableau sans accéder plusieurs fois à l'objet, d'où optimisation
         final int length = appWidgetIds.length;
         for (int i = 0 ; i < length ; i++) {
-            // Gestion de la vue
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
-            // et du bouton
             views.setTextViewText(R.id.light1, textButton);
             views.setInt(R.id.light1, "setBackgroundColor", backgroundButton);
-            // pass appWidgetId to the click handler
             views.setOnClickPendingIntent(R.id.light1, buildButtonPendingIntent(context, appWidgetIds[i],
                     this.active, this.firstLaunch));
-            // pass appWidgetId to the update method
             pushWidgetUpdate(context, views, appWidgetIds[i]);
         }
     }
@@ -51,13 +45,11 @@ public class AppWidget extends AppWidgetProvider {
     public static void pushWidgetUpdate(Context context, RemoteViews remoteViews, int appWidgetId) {
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
         manager.updateAppWidget(appWidgetId, remoteViews);
-
     }
 
     public static PendingIntent buildButtonPendingIntent(Context context, int appWidgetId,
                                                          boolean active, boolean firstLaunch) {
         Intent intent = new Intent();
-        // put the appWidgetId as an extra to the update intent
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 
@@ -115,15 +107,14 @@ public class AppWidget extends AppWidgetProvider {
                     fetchTask.execute(url);
                 }
                 firstLaunch = false;
-                this.updateWidgetPictureAndButtonListener(context, widgetId, active, firstLaunch);
+                this.updateWidgetTypeListener(context, widgetId, active, firstLaunch);
             }
         }
 
-        // On revient au traitement naturel du Receiver, qui va lancer onUpdate s'il y a demande de mise à jour
         super.onReceive(context, intent);
     }
 
-    private void updateWidgetPictureAndButtonListener(Context context, int appWidgetId, boolean active, boolean firstLaunch) {
+    private void updateWidgetTypeListener(Context context, int appWidgetId, boolean active, boolean firstLaunch) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String value = prefs.getString("type_" + appWidgetId, null);

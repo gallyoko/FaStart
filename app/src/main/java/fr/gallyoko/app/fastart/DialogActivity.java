@@ -73,7 +73,6 @@ public class DialogActivity extends Activity {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getDialogContext());
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("type_" + mAppWidgetId, widgetTypes.get(which).getName());
-                editor.putString("last_type", widgetTypes.get(which).getName());
                 editor.commit();
                 setResult(RESULT_OK, resultValue);
                 Intent refreshIntent = new Intent(getDialogContext(), AppWidget.class);
