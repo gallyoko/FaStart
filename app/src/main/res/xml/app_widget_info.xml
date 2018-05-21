@@ -7,5 +7,5 @@
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen|keyguard"
     android:initialKeyguardLayout="@layout/app_widget_button"
-    android:configure="fr.gallyoko.app.fastart.DialogActivity">
+    android:configure="fr.gallyoko.app.fastart.ConfigurationWidgetActivity">
 </appwidget-provider>
