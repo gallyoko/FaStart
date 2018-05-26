@@ -1,4 +1,4 @@
-package fr.gallyoko.app.fastart;
+package fr.gallyoko.app.fastart.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -11,6 +11,8 @@ import android.net.NetworkInfo;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import fr.gallyoko.app.fastart.service.FetchTask;
+import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
 import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
 

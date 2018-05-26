@@ -1,32 +1,30 @@
-package fr.gallyoko.app.fastart;
+package fr.gallyoko.app.fastart.widget;
 
 import android.app.Activity;
+import android.appwidget.AppWidgetManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.graphics.Color;
-
-import android.appwidget.AppWidgetManager;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
-import fr.gallyoko.app.fastart.bdd.entity.WidgetTypeEntity;
+import fr.gallyoko.app.fastart.AppWidget;
+import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
 import fr.gallyoko.app.fastart.bdd.entity.ColorEntity;
-
-import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
-import fr.gallyoko.app.fastart.bdd.repository.WidgetTypeRepository;
+import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
+import fr.gallyoko.app.fastart.bdd.entity.WidgetTypeEntity;
 import fr.gallyoko.app.fastart.bdd.repository.ApiRepository;
 import fr.gallyoko.app.fastart.bdd.repository.ColorRepository;
+import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
+import fr.gallyoko.app.fastart.bdd.repository.WidgetTypeRepository;
 
 public class ConfigurationWidgetActivity extends Activity {
 
@@ -261,7 +259,6 @@ public class ConfigurationWidgetActivity extends Activity {
                 }
             }
         }
-
     }
 
     private void updateConfig() {

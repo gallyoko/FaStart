@@ -5,7 +5,7 @@
     android:background="@android:color/holo_blue_light"
     android:gravity="top"
     android:orientation="vertical"
-    tools:context="fr.gallyoko.app.fastart.ConfigurationWidgetActivity">
+    tools:context="fr.gallyoko.app.fastart.widget.ConfigurationWidgetActivity">
 
     <TextView
         android:layout_width="fill_parent"
