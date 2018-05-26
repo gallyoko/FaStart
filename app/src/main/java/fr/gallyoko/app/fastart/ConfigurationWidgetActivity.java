@@ -58,8 +58,36 @@ public class ConfigurationWidgetActivity extends Activity {
 
         this.updateConfig();
 
+        this.initView();
+    }
+
+    private void initView() {
         setContentView(R.layout.activity_config_widget);
 
+        this.initViewType();
+        this.initViewApi();
+        this.initViewColors();
+
+        this.textOn = findViewById(R.id.textOn);
+        this.textOff = findViewById(R.id.textOff);
+
+        findViewById(R.id.buttonOk).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveWidget();
+            }
+        });
+
+        findViewById(R.id.buttonCancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
+        });
+    }
+
+    private void initViewType() {
         Spinner dropdown = findViewById(R.id.type);
 
         WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(this);
@@ -89,7 +117,9 @@ public class ConfigurationWidgetActivity extends Activity {
 
             }
         });
+    }
 
+    private void initViewApi() {
         Spinner dropdownApi = findViewById(R.id.api);
 
         ApiRepository apiRepository = new ApiRepository(this);
@@ -119,10 +149,9 @@ public class ConfigurationWidgetActivity extends Activity {
                 apiPositionSelect = -1;
             }
         });
+    }
 
-        this.textOn = findViewById(R.id.textOn);
-        this.textOff = findViewById(R.id.textOff);
-
+    private void initViewColors() {
         ColorRepository colorRepository = new ColorRepository(this);
         colorRepository.open();
         colorsOn = colorRepository.getAll();
@@ -171,21 +200,6 @@ public class ConfigurationWidgetActivity extends Activity {
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
                 colorOffPositionSelect = -1;
-            }
-        });
-
-        findViewById(R.id.buttonOk).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                saveWidget();
-            }
-        });
-
-        findViewById(R.id.buttonCancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setResult(RESULT_CANCELED);
-                finish();
             }
         });
     }
