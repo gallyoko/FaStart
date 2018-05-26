@@ -11,12 +11,22 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private static final String WIDGET_COL_ID = "id";
     private static final String WIDGET_COL_APP_WIDGET_ID = "app_widget_id";
     private static final String WIDGET_COL_TITLE = "title";
+    private static final String WIDGET_COL_TEXT_ON = "text_on";
+    private static final String WIDGET_COL_COLOR_ON = "color_on";
+    private static final String WIDGET_COL_TEXT_OFF = "text_off";
+    private static final String WIDGET_COL_COLOR_OFF = "color_off";
     private static final String WIDGET_COL_TYPE = "type";
     private static final String WIDGET_COL_API = "api";
+    private static final String WIDGET_COL_INIT = "init";
 
     private static final String TABLE_WIDGET_TYPE = "widget_type";
     private static final String WIDGET_TYPE_COL_ID = "id";
     private static final String WIDGET_TYPE_COL_NAME = "name";
+
+    private static final String TABLE_COLOR = "color";
+    private static final String COLOR_COL_ID = "id";
+    private static final String COLOR_COL_NAME = "name";
+    private static final String COLOR_COL_VALUE = "value";
 
     private static final String TABLE_API = "api";
     private static final String API_COL_ID = "id";
@@ -30,11 +40,16 @@ public class FaStartBdd extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_WIDGET = "CREATE TABLE " + TABLE_WIDGET + " ("
             + WIDGET_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_COL_APP_WIDGET_ID + " INTEGER NOT NULL, "
-            + WIDGET_COL_TITLE + " TEXT NOT NULL, " + WIDGET_COL_TYPE + " INTEGER NOT NULL, "
-            + WIDGET_COL_API + " INTEGER NOT NULL);";
+            + WIDGET_COL_TITLE + " TEXT NOT NULL, " + WIDGET_COL_TEXT_ON + " TEXT NOT NULL, "
+            + WIDGET_COL_COLOR_ON + " INTEGER NOT NULL, " + WIDGET_COL_TEXT_OFF + " TEXT NOT NULL, "
+            + WIDGET_COL_COLOR_OFF + " INTEGER NOT NULL, " + WIDGET_COL_TYPE + " INTEGER NOT NULL, "
+            + WIDGET_COL_API + " INTEGER NOT NULL, " + WIDGET_COL_INIT + " INTEGER NOT NULL);";
 
     private static final String CREATE_TABLE_WIDGET_TYPE = "CREATE TABLE " + TABLE_WIDGET_TYPE + " ("
             + WIDGET_TYPE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_TYPE_COL_NAME + " TEXT NOT NULL);";
+
+    private static final String CREATE_TABLE_COLOR = "CREATE TABLE " + TABLE_COLOR + " ("
+            + COLOR_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLOR_COL_NAME + " TEXT NOT NULL, " + COLOR_COL_VALUE + " INTEGER NOT NULL);";
 
     private static final String CREATE_TABLE_API = "CREATE TABLE " + TABLE_API + " ("
             + API_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + API_COL_NAME + " TEXT NOT NULL, "
@@ -65,6 +80,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
         try {
             db.execSQL(CREATE_TABLE_WIDGET_TYPE);
             db.execSQL(CREATE_TABLE_API);
+            db.execSQL(CREATE_TABLE_COLOR);
         } catch (Exception ex) {
             // todo
         }
@@ -74,6 +90,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
         try {
             db.execSQL("DROP TABLE " + TABLE_API + ";");
             db.execSQL("DROP TABLE " + TABLE_WIDGET_TYPE + ";");
+            db.execSQL("DROP TABLE " + TABLE_COLOR + ";");
         } catch (Exception ex) {
             // todo
         }
