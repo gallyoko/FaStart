@@ -262,6 +262,9 @@ public class ConfigurationWidgetActivity extends Activity {
     }
 
     private void updateConfig() {
+        String urlDev = "http://172.20.0.2:8091";
+        String urlProd = "http://83.157.150.119:9394";
+
         WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(this);
         widgetTypeRepository.open();
         if (widgetTypeRepository.getByName("button") == null) {
@@ -279,7 +282,7 @@ public class ConfigurationWidgetActivity extends Activity {
         if (apiRepository.getByName("lumière salon") == null) {
             ApiEntity apiEntity = new ApiEntity("lumière salon",
                     "Allume ou éteind l'halogène du salon",
-                    "http://172.20.0.2:8091/api/light", "/put/on/1", "Lumière salon allumée.",
+                    urlDev + "/api/light", "/put/on/1", "Lumière salon allumée.",
                     "/put/off/1", "Lumière salon éteinte.");
             apiRepository.insert(apiEntity);
         }
