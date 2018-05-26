@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import fr.gallyoko.app.fastart.AppWidget;
 import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
 import fr.gallyoko.app.fastart.bdd.entity.ColorEntity;
@@ -245,17 +244,18 @@ public class ConfigurationWidgetActivity extends Activity {
                         textOff.getText().toString(), colorEntityOff, widgetTypeEntity, apiEntity, 0);
                 widgetRepository.insert(widgetEntity);
                 widgetRepository.close();
-                setResult(RESULT_OK, resultValue);
-                Intent refreshIntent = new Intent(this, AppWidget.class);
-                refreshIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                refreshIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-                sendBroadcast(refreshIntent);
-                finish();
             } catch (Exception ex) {
                 message = ex.getMessage();
             } finally {
                 if (!message.equals("")) {
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent refreshIntent = new Intent(this, AppWidget.class);
+                    refreshIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+                    refreshIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+                    sendBroadcast(refreshIntent);
+                    setResult(RESULT_OK, resultValue);
+                    finish();
                 }
             }
         }
