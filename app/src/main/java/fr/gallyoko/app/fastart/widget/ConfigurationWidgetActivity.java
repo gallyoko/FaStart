@@ -29,7 +29,8 @@ public class ConfigurationWidgetActivity extends Activity {
 
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private int typePositionSelect = -1;
-    private int apiPositionSelect = -1;
+    private int api1PositionSelect = -1;
+    private int api2PositionSelect = -1;
     private int colorOnPositionSelect = -1;
     private int colorOffPositionSelect = -1;
     private ArrayList<WidgetTypeEntity> widgetTypes = null;
@@ -92,8 +93,9 @@ public class ConfigurationWidgetActivity extends Activity {
         widgetTypes = widgetTypeRepository.getAll();
         widgetTypeRepository.close();
 
-        String[] items = new String[widgetTypes.size()];
-        int index = 0;
+        String[] items = new String[widgetTypes.size()+1];
+        items[0] = "Select type ...";
+        int index = 1;
         for (WidgetTypeEntity widgetType: widgetTypes) {
             items[index] = widgetType.getName();
             index ++;
@@ -117,33 +119,50 @@ public class ConfigurationWidgetActivity extends Activity {
     }
 
     private void initViewApi() {
-        Spinner dropdownApi = findViewById(R.id.api);
+        Spinner dropdownApi1 = findViewById(R.id.api1);
+        Spinner dropdownApi2 = findViewById(R.id.api2);
 
         ApiRepository apiRepository = new ApiRepository(this);
         apiRepository.open();
         apis = apiRepository.getAll();
         apiRepository.close();
 
-        String[] itemsApi = new String[apis.size()];
-        int indexApi = 0;
+        String[] itemsApi = new String[apis.size()+1];
+        itemsApi[0] = "Select action ...";
+        int indexApi = 1;
         for (ApiEntity api: apis) {
             itemsApi[indexApi] = api.getName();
             indexApi ++;
         }
 
-        ArrayAdapter<String> adapterApi = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, itemsApi);
-        dropdownApi.setAdapter(adapterApi);
+        ArrayAdapter<String> adapterApi1 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, itemsApi);
+        dropdownApi1.setAdapter(adapterApi1);
+        ArrayAdapter<String> adapterApi2 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, itemsApi);
+        dropdownApi2.setAdapter(adapterApi2);
 
-        dropdownApi.setOnItemSelectedListener(new OnItemSelectedListener() {
+        dropdownApi1.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
-                    apiPositionSelect = position;
+                    api1PositionSelect = position;
                 }
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                apiPositionSelect = -1;
+                api1PositionSelect = -1;
+            }
+        });
+
+        dropdownApi2.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position >= 0) {
+                    api2PositionSelect = position;
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                api2PositionSelect = -1;
             }
         });
     }
@@ -155,9 +174,11 @@ public class ConfigurationWidgetActivity extends Activity {
         colorsOff = colorRepository.getAll();
         colorRepository.close();
 
-        String[] itemsColorOn = new String[colorsOn.size()];
-        String[] itemsColorOff = new String[colorsOff.size()];
-        int indexColor = 0;
+        String[] itemsColorOn = new String[colorsOn.size()+1];
+        String[] itemsColorOff = new String[colorsOff.size()+1];
+        itemsColorOn[0] = "Select color ...";
+        itemsColorOff[0] = "Select color ...";
+        int indexColor = 1;
         for (ColorEntity color: colorsOn) {
             itemsColorOn[indexColor] = color.getName();
             itemsColorOff[indexColor] = color.getName();
@@ -209,13 +230,13 @@ public class ConfigurationWidgetActivity extends Activity {
         if (widgetRepository.getByAppWidgetId(mAppWidgetId) == null) {
             String message = "";
             try {
-                if (this.typePositionSelect < 0) {
+                if (this.typePositionSelect <= 0) {
                     throw new Exception("Veuillez sélectionner un type.");
-                } else if (this.apiPositionSelect < 0) {
+                } else if (this.api1PositionSelect <= 0 && this.api2PositionSelect <= 0) {
                     throw new Exception("Veuillez sélectionner une action.");
-                } else if (this.colorOnPositionSelect < 0) {
+                } else if (this.colorOnPositionSelect <= 0) {
                     throw new Exception("Veuillez sélectionner une couleur pour l'action ON.");
-                } else if (this.colorOffPositionSelect < 0) {
+                } else if (this.colorOffPositionSelect <= 0) {
                     throw new Exception("Veuillez sélectionner une couleur pour l'action OFF.");
                 } else if (textOn.getText().toString().equals("")) {
                     throw new Exception("Veuillez saisir un texte pour l'action ON.");
@@ -224,22 +245,29 @@ public class ConfigurationWidgetActivity extends Activity {
                 }
                 WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(this);
                 widgetTypeRepository.open();
-                WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(widgetTypes.get(this.typePositionSelect).getId());
+                WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(widgetTypes.get(this.typePositionSelect-1).getId());
                 widgetTypeRepository.close();
 
+                ArrayList<ApiEntity> apisToSave = new ArrayList();
                 ApiRepository apiRepository = new ApiRepository(this);
                 apiRepository.open();
-                String titleWidget = apis.get(this.apiPositionSelect).getName();
-                ApiEntity apiEntity = apiRepository.getById(apis.get(this.apiPositionSelect).getId());
+                String titleWidget = "";
+                if (this.api1PositionSelect > 0) {
+                    titleWidget = apis.get(this.api1PositionSelect-1).getName();
+                    ApiEntity apiEntity1 = apiRepository.getById(apis.get(this.api1PositionSelect-1).getId());
+                    apisToSave.add(apiEntity1);
+                }
+                if (this.api2PositionSelect > 0) {
+                    titleWidget += " - " + apis.get(this.api2PositionSelect-1).getName();
+                    ApiEntity apiEntity2 = apiRepository.getById(apis.get(this.api2PositionSelect-1).getId());
+                    apisToSave.add(apiEntity2);
+                }
                 apiRepository.close();
-
-                ArrayList<ApiEntity> apisToSave = new ArrayList();
-                apisToSave.add(apiEntity);
 
                 ColorRepository colorRepository = new ColorRepository(this);
                 colorRepository.open();
-                ColorEntity colorEntityOn = colorRepository.getById(colorsOn.get(this.colorOnPositionSelect).getId());
-                ColorEntity colorEntityOff = colorRepository.getById(colorsOff.get(this.colorOffPositionSelect).getId());
+                ColorEntity colorEntityOn = colorRepository.getById(colorsOn.get(this.colorOnPositionSelect-1).getId());
+                ColorEntity colorEntityOff = colorRepository.getById(colorsOff.get(this.colorOffPositionSelect-1).getId());
                 colorRepository.close();
 
                 WidgetEntity widgetEntity = new WidgetEntity(mAppWidgetId,

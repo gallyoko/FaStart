@@ -26,12 +26,27 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Action : "
+        android:text="Action 1 : "
         android:textColor="#FF0000"
         android:textStyle="bold" />
 
     <Spinner
-        android:id="@+id/api"
+        android:id="@+id/api1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Action 2 : "
+        android:textColor="#FF0000"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/api2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:drawable/btn_dropdown"

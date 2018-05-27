@@ -11,8 +11,6 @@ import android.net.NetworkInfo;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
 import fr.gallyoko.app.fastart.service.FetchTask;
 import fr.gallyoko.app.fastart.R;
