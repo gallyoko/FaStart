@@ -4,11 +4,15 @@ public class WidgetTypeEntity {
 
     private int id;
     private String name;
+    private int imageOn;
+    private int imageOff;
 
     public WidgetTypeEntity(){}
 
-    public WidgetTypeEntity(String name){
+    public WidgetTypeEntity(String name, int imageOn, int imageOff){
         this.name = name;
+        this.imageOn = imageOn;
+        this.imageOff = imageOff;
     }
 
     public int getId() {
@@ -27,7 +31,19 @@ public class WidgetTypeEntity {
         this.name = name;
     }
 
-    public String toString(){
-        return "ID : "+this.id+"\nName : "+this.name;
+    public int getImageOn() {
+        return this.imageOn;
+    }
+
+    public void setImageOn(int imageOn) {
+        this.imageOn = imageOn;
+    }
+
+    public int getImageOff() {
+        return this.imageOff;
+    }
+
+    public void setImageOff(int imageOff) {
+        this.imageOff = imageOff;
     }
 }

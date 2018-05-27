@@ -294,16 +294,16 @@ public class ConfigurationWidgetActivity extends Activity {
 
     private void updateConfig() {
         String urlDev = "http://172.20.0.2:8091";
-        String urlProd = "http://83.157.150.119:9394";
+        //String urlProd = "http://83.157.150.119:9394";
 
         WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(this);
         widgetTypeRepository.open();
         if (widgetTypeRepository.getByName("button") == null) {
-            WidgetTypeEntity widgetTypeEntity1 = new WidgetTypeEntity("button");
+            WidgetTypeEntity widgetTypeEntity1 = new WidgetTypeEntity("button", R.mipmap.button_on, R.mipmap.button_off);
             widgetTypeRepository.insert(widgetTypeEntity1);
         }
         if (widgetTypeRepository.getByName("toggle") == null) {
-            WidgetTypeEntity widgetTypeEntity2 = new WidgetTypeEntity("toggle");
+            WidgetTypeEntity widgetTypeEntity2 = new WidgetTypeEntity("toggle", R.mipmap.toggle_switch_off, R.mipmap.toggle_switch_on);
             widgetTypeRepository.insert(widgetTypeEntity2);
         }
         widgetTypeRepository.close();
@@ -320,7 +320,7 @@ public class ConfigurationWidgetActivity extends Activity {
         if (apiRepository.getByName("lumière TV") == null) {
             ApiEntity apiEntity = new ApiEntity("lumière TV",
                     "Allume ou éteind la petite lumière TV du salon",
-                    "http://172.20.0.2:8091/api/light", "/put/on/2", "Lumière TV allumée.",
+                    urlDev + "/api/light", "/put/on/2", "Lumière TV allumée.",
                     "/put/off/2", "Lumière TV éteinte.");
             apiRepository.insert(apiEntity);
         }

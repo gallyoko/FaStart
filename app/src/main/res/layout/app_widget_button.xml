@@ -7,15 +7,11 @@
     android:background="#000715b5"
     android:orientation="vertical">
 
-    <Button
+    <ImageButton
         android:id="@+id/element"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
         android:layout_weight="20"
-        />
+        android:background="@android:color/transparent" />
 
 </LinearLayout>

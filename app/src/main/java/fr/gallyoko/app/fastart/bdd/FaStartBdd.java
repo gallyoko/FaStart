@@ -26,6 +26,8 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private static final String TABLE_WIDGET_TYPE = "widget_type";
     private static final String WIDGET_TYPE_COL_ID = "id";
     private static final String WIDGET_TYPE_COL_NAME = "name";
+    private static final String WIDGET_TYPE_COL_IMG_ON = "image_on";
+    private static final String WIDGET_TYPE_COL_IMG_OFF = "image_off";
 
     private static final String TABLE_COLOR = "color";
     private static final String COLOR_COL_ID = "id";
@@ -53,7 +55,8 @@ public class FaStartBdd extends SQLiteOpenHelper {
             + WIDGET_API_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_API_COL_WIDGET + " INTEGER NOT NULL, " + WIDGET_API_COL_API + " INTEGER NOT NULL);";
 
     private static final String CREATE_TABLE_WIDGET_TYPE = "CREATE TABLE " + TABLE_WIDGET_TYPE + " ("
-            + WIDGET_TYPE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_TYPE_COL_NAME + " TEXT NOT NULL);";
+            + WIDGET_TYPE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_TYPE_COL_NAME + " TEXT NOT NULL, " + WIDGET_TYPE_COL_IMG_ON + " INTEGER NOT NULL, "
+            + WIDGET_TYPE_COL_IMG_OFF + " INTEGER NOT NULL);";
 
     private static final String CREATE_TABLE_COLOR = "CREATE TABLE " + TABLE_COLOR + " ("
             + COLOR_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLOR_COL_NAME + " TEXT NOT NULL, " + COLOR_COL_VALUE + " INTEGER NOT NULL);";
