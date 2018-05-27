@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import fr.gallyoko.app.fastart.bdd.FaStartBdd;
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
+import fr.gallyoko.app.fastart.bdd.entity.WidgetApiEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetTypeEntity;
 import fr.gallyoko.app.fastart.bdd.entity.ColorEntity;
@@ -35,10 +36,8 @@ public class WidgetRepository {
     private static final int NUM_COL_COLOR_OFF = 6;
     private static final String COL_TYPE = "type";
     private static final int NUM_COL_TYPE = 7;
-    private static final String COL_API = "api";
-    private static final int NUM_COL_API = 8;
     private static final String COL_INIT = "init";
-    private static final int NUM_COL_INIT = 9;
+    private static final int NUM_COL_INIT = 8;
 
     private SQLiteDatabase bdd;
     private Context context;
@@ -73,9 +72,18 @@ public class WidgetRepository {
         values.put(COL_TEXT_OFF, widget.getTextOff());
         values.put(COL_COLOR_OFF, widget.getColorOff().getId());
         values.put(COL_TYPE, widget.getType().getId());
-        values.put(COL_API, widget.getApi().getId());
         values.put(COL_INIT, widget.getInit());
-        return bdd.insert(TABLE_NAME, null, values);
+        long widgetId = bdd.insert(TABLE_NAME, null, values);
+        widget.setId(((int) widgetId));
+        WidgetApiRepository widgetApiRepository = new WidgetApiRepository(this.context);
+        widgetApiRepository.open();
+        for (ApiEntity api: widget.getApis()) {
+            WidgetApiEntity widgetApiEntity = new WidgetApiEntity(widget, api);
+            widgetApiRepository.insert(widgetApiEntity);
+        }
+        widgetApiRepository.close();
+
+        return widgetId;
     }
 
     public int update(int id, WidgetEntity widget){
@@ -87,7 +95,6 @@ public class WidgetRepository {
         values.put(COL_TEXT_OFF, widget.getTextOff());
         values.put(COL_COLOR_OFF, widget.getColorOff().getId());
         values.put(COL_TYPE, widget.getType().getId());
-        values.put(COL_API, widget.getApi().getId());
         values.put(COL_INIT, widget.getInit());
         return bdd.update(TABLE_NAME, values, COL_ID + " = " +id, null);
     }
@@ -97,17 +104,17 @@ public class WidgetRepository {
     }
 
     public WidgetEntity getById(int id){
-        Cursor c = bdd.query(TABLE_NAME, new String[] {COL_ID, COL_APP_WIDGET_ID, COL_TITLE, COL_TEXT_ON, COL_COLOR_ON, COL_TEXT_OFF, COL_COLOR_OFF, COL_TYPE, COL_API, COL_INIT}, COL_ID + " = \"" + id +"\"", null, null, null, null);
+        Cursor c = bdd.query(TABLE_NAME, new String[] {COL_ID, COL_APP_WIDGET_ID, COL_TITLE, COL_TEXT_ON, COL_COLOR_ON, COL_TEXT_OFF, COL_COLOR_OFF, COL_TYPE, COL_INIT}, COL_ID + " = \"" + id +"\"", null, null, null, null);
         return cursorToWidgetEntity(c);
     }
 
     public WidgetEntity getByAppWidgetId(int appWidgetId){
-        Cursor c = bdd.query(TABLE_NAME, new String[] {COL_ID, COL_APP_WIDGET_ID, COL_TITLE, COL_TEXT_ON, COL_COLOR_ON, COL_TEXT_OFF, COL_COLOR_OFF,COL_TYPE, COL_API, COL_INIT}, COL_APP_WIDGET_ID + " = \"" + appWidgetId +"\"", null, null, null, null);
+        Cursor c = bdd.query(TABLE_NAME, new String[] {COL_ID, COL_APP_WIDGET_ID, COL_TITLE, COL_TEXT_ON, COL_COLOR_ON, COL_TEXT_OFF, COL_COLOR_OFF,COL_TYPE, COL_INIT}, COL_APP_WIDGET_ID + " = \"" + appWidgetId +"\"", null, null, null, null);
         return cursorToWidgetEntity(c);
     }
 
     public ArrayList<WidgetEntity> getAll(){
-        Cursor c = bdd.query(TABLE_NAME, new String[] {COL_ID, COL_APP_WIDGET_ID, COL_TITLE, COL_TEXT_ON, COL_COLOR_ON, COL_TEXT_OFF, COL_COLOR_OFF,COL_TYPE, COL_API, COL_INIT}, null, null, null, null, null);
+        Cursor c = bdd.query(TABLE_NAME, new String[] {COL_ID, COL_APP_WIDGET_ID, COL_TITLE, COL_TEXT_ON, COL_COLOR_ON, COL_TEXT_OFF, COL_COLOR_OFF,COL_TYPE, COL_INIT}, null, null, null, null, null);
         return cursorToWidgetEntityArrayList(c);
     }
 
@@ -136,15 +143,16 @@ public class WidgetRepository {
         widgetTypeRepository.open();
         WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(c.getInt(NUM_COL_TYPE));
         widget.setType(widgetTypeEntity);
-        ApiRepository apiRepository = new ApiRepository(this.context);
-        apiRepository.open();
-        ApiEntity apiEntity = apiRepository.getById(c.getInt(NUM_COL_API));
-        widget.setApi(apiEntity);
+
+        WidgetApiRepository widgetApiRepository = new WidgetApiRepository(this.context);
+        widgetApiRepository.open();
+        ArrayList<ApiEntity> apis = widgetApiRepository.getApiByWidget(widget);
+        widget.setApis(apis);
+
         widget.setInit(c.getInt(NUM_COL_INIT));
         //On ferme le cursor
         c.close();
         widgetTypeRepository.close();
-        apiRepository.close();
         colorRepository.close();
         return widget;
     }
@@ -156,8 +164,8 @@ public class WidgetRepository {
         ArrayList<WidgetEntity> widgets = new ArrayList();
         WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(this.context);
         widgetTypeRepository.open();
-        ApiRepository apiRepository = new ApiRepository(this.context);
-        apiRepository.open();
+        WidgetApiRepository widgetApiRepository = new WidgetApiRepository(this.context);
+        widgetApiRepository.open();
         ColorRepository colorRepository = new ColorRepository(this.context);
         colorRepository.open();
         //Sinon on se place sur le premier élément
@@ -175,16 +183,16 @@ public class WidgetRepository {
                 widget.setColorOff(colorEntityOff);
                 WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(c.getInt(NUM_COL_TYPE));
                 widget.setType(widgetTypeEntity);
-                ApiEntity apiEntity = apiRepository.getById(c.getInt(NUM_COL_API));
-                widget.setApi(apiEntity);
+                ArrayList<ApiEntity> apis = widgetApiRepository.getApiByWidget(widget);
+                widget.setApis(apis);
                 widget.setInit(c.getInt(NUM_COL_INIT));
                 widgets.add(widget);
             } while (c.moveToNext());
         }
         c.close();
         widgetTypeRepository.close();
-        apiRepository.close();
         colorRepository.close();
+        widgetApiRepository.close();
 
         return widgets;
     }

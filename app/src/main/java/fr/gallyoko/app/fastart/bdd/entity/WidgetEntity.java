@@ -1,5 +1,7 @@
 package fr.gallyoko.app.fastart.bdd.entity;
 
+import java.util.ArrayList;
+
 public class WidgetEntity {
 
     private int id;
@@ -10,13 +12,13 @@ public class WidgetEntity {
     private String textOff;
     private ColorEntity colorOff;
     private WidgetTypeEntity type;
-    private ApiEntity api;
+    private ArrayList<ApiEntity> apis = null;
     private int init;
 
     public WidgetEntity(){}
 
     public WidgetEntity(int appWidgetId, String title, String textOn, ColorEntity colorOn, String textOff,
-                        ColorEntity colorOff, WidgetTypeEntity type, ApiEntity api, int init){
+                        ColorEntity colorOff, WidgetTypeEntity type, ArrayList<ApiEntity> apis, int init){
         this.appWidgetId = appWidgetId;
         this.title = title;
         this.textOn = textOn;
@@ -24,7 +26,7 @@ public class WidgetEntity {
         this.textOff = textOff;
         this.colorOff = colorOff;
         this.type = type;
-        this.api = api;
+        this.apis = apis;
         this.init = init;
     }
 
@@ -92,12 +94,12 @@ public class WidgetEntity {
         this.type = type;
     }
 
-    public ApiEntity getApi() {
-        return this.api;
+    public ArrayList<ApiEntity> getApis() {
+        return this.apis;
     }
 
-    public void setApi(ApiEntity api) {
-        this.api = api;
+    public void setApis(ArrayList<ApiEntity> apis) {
+        this.apis = apis;
     }
 
     public int getInit() {

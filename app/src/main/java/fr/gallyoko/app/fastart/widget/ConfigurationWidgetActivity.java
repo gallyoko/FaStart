@@ -233,6 +233,9 @@ public class ConfigurationWidgetActivity extends Activity {
                 ApiEntity apiEntity = apiRepository.getById(apis.get(this.apiPositionSelect).getId());
                 apiRepository.close();
 
+                ArrayList<ApiEntity> apisToSave = new ArrayList();
+                apisToSave.add(apiEntity);
+
                 ColorRepository colorRepository = new ColorRepository(this);
                 colorRepository.open();
                 ColorEntity colorEntityOn = colorRepository.getById(colorsOn.get(this.colorOnPositionSelect).getId());
@@ -241,7 +244,7 @@ public class ConfigurationWidgetActivity extends Activity {
 
                 WidgetEntity widgetEntity = new WidgetEntity(mAppWidgetId,
                         titleWidget, textOn.getText().toString(), colorEntityOn,
-                        textOff.getText().toString(), colorEntityOff, widgetTypeEntity, apiEntity, 0);
+                        textOff.getText().toString(), colorEntityOff, widgetTypeEntity, apisToSave, 0);
                 widgetRepository.insert(widgetEntity);
                 widgetRepository.close();
             } catch (Exception ex) {

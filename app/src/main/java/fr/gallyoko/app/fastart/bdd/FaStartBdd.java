@@ -16,8 +16,12 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private static final String WIDGET_COL_TEXT_OFF = "text_off";
     private static final String WIDGET_COL_COLOR_OFF = "color_off";
     private static final String WIDGET_COL_TYPE = "type";
-    private static final String WIDGET_COL_API = "api";
     private static final String WIDGET_COL_INIT = "init";
+
+    private static final String TABLE_WIDGET_API = "widget_api";
+    private static final String WIDGET_API_COL_ID = "id";
+    private static final String WIDGET_API_COL_WIDGET = "widget_id";
+    private static final String WIDGET_API_COL_API = "api_id";
 
     private static final String TABLE_WIDGET_TYPE = "widget_type";
     private static final String WIDGET_TYPE_COL_ID = "id";
@@ -43,7 +47,10 @@ public class FaStartBdd extends SQLiteOpenHelper {
             + WIDGET_COL_TITLE + " TEXT NOT NULL, " + WIDGET_COL_TEXT_ON + " TEXT NOT NULL, "
             + WIDGET_COL_COLOR_ON + " INTEGER NOT NULL, " + WIDGET_COL_TEXT_OFF + " TEXT NOT NULL, "
             + WIDGET_COL_COLOR_OFF + " INTEGER NOT NULL, " + WIDGET_COL_TYPE + " INTEGER NOT NULL, "
-            + WIDGET_COL_API + " INTEGER NOT NULL, " + WIDGET_COL_INIT + " INTEGER NOT NULL);";
+            + WIDGET_COL_INIT + " INTEGER NOT NULL);";
+
+    private static final String CREATE_TABLE_WIDGET_API = "CREATE TABLE " + TABLE_WIDGET_API + " ("
+            + WIDGET_API_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_API_COL_WIDGET + " INTEGER NOT NULL, " + WIDGET_API_COL_API + " INTEGER NOT NULL);";
 
     private static final String CREATE_TABLE_WIDGET_TYPE = "CREATE TABLE " + TABLE_WIDGET_TYPE + " ("
             + WIDGET_TYPE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_TYPE_COL_NAME + " TEXT NOT NULL);";
@@ -65,6 +72,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         this.dropTableConfig(db);
         db.execSQL(CREATE_TABLE_WIDGET);
+        db.execSQL(CREATE_TABLE_WIDGET_API);
         this.createTableConfig(db);
     }
 

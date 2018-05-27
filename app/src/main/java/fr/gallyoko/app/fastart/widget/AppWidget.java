@@ -11,6 +11,9 @@ import android.net.NetworkInfo;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
+import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
 import fr.gallyoko.app.fastart.service.FetchTask;
 import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
@@ -71,16 +74,13 @@ public class AppWidget extends AppWidgetProvider {
             if (!this.isConnected(context)) {
                 Toast.makeText(context, "Aucune connexion à internet.", Toast.LENGTH_SHORT).show();
             } else {
-                WidgetRepository widgetRepository = new WidgetRepository(context);
-                widgetRepository.open();
-                WidgetEntity widget = widgetRepository.getByAppWidgetId(widgetId);
-                widgetRepository.close();
                 if (!extraFirstLaunch) {
-                    String url = widget.getApi().getUrl() + widget.getApi().getPutOn();
-                    String messageSuccess = widget.getApi().getPutOnMsg();
+                    WidgetRepository widgetRepository = new WidgetRepository(context);
+                    widgetRepository.open();
+                    WidgetEntity widget = widgetRepository.getByAppWidgetId(widgetId);
+                    widgetRepository.close();
+
                     if (extraActive) {
-                        url = widget.getApi().getUrl() + widget.getApi().getPutOff();
-                        messageSuccess = widget.getApi().getPutOffMsg();
                         active = false;
                         textButton = widget.getTextOn();
                         backgroundButton = widget.getColorOn().getValue();
@@ -89,10 +89,21 @@ public class AppWidget extends AppWidgetProvider {
                         textButton = widget.getTextOff();
                         backgroundButton = widget.getColorOff().getValue();
                     }
-                    FetchTask fetchTask = new FetchTask();
-                    fetchTask.context = context;
-                    fetchTask.messageSuccess = messageSuccess;
-                    fetchTask.execute(url);
+                    for (ApiEntity api: widget.getApis()) {
+                        if (extraActive) {
+                            String url = api.getUrl() + api.getPutOff();
+                            FetchTask fetchTask = new FetchTask();
+                            fetchTask.context = context;
+                            fetchTask.messageSuccess = api.getPutOffMsg();
+                            fetchTask.execute(url);
+                        } else {
+                            String url = api.getUrl() + api.getPutOn();
+                            FetchTask fetchTask = new FetchTask();
+                            fetchTask.context = context;
+                            fetchTask.messageSuccess = api.getPutOnMsg();
+                            fetchTask.execute(url);
+                        }
+                    }
                 }
                 firstLaunch = false;
                 this.updateWidgetTypeListener(context, widgetId, active);
