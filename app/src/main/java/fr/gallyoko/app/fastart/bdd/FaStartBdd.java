@@ -11,10 +11,6 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private static final String WIDGET_COL_ID = "id";
     private static final String WIDGET_COL_APP_WIDGET_ID = "app_widget_id";
     private static final String WIDGET_COL_TITLE = "title";
-    private static final String WIDGET_COL_TEXT_ON = "text_on";
-    private static final String WIDGET_COL_COLOR_ON = "color_on";
-    private static final String WIDGET_COL_TEXT_OFF = "text_off";
-    private static final String WIDGET_COL_COLOR_OFF = "color_off";
     private static final String WIDGET_COL_TYPE = "type";
     private static final String WIDGET_COL_INIT = "init";
 
@@ -46,9 +42,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_WIDGET = "CREATE TABLE " + TABLE_WIDGET + " ("
             + WIDGET_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_COL_APP_WIDGET_ID + " INTEGER NOT NULL, "
-            + WIDGET_COL_TITLE + " TEXT NOT NULL, " + WIDGET_COL_TEXT_ON + " TEXT NOT NULL, "
-            + WIDGET_COL_COLOR_ON + " INTEGER NOT NULL, " + WIDGET_COL_TEXT_OFF + " TEXT NOT NULL, "
-            + WIDGET_COL_COLOR_OFF + " INTEGER NOT NULL, " + WIDGET_COL_TYPE + " INTEGER NOT NULL, "
+            + WIDGET_COL_TITLE + " TEXT NOT NULL, " + WIDGET_COL_TYPE + " INTEGER NOT NULL, "
             + WIDGET_COL_INIT + " INTEGER NOT NULL);";
 
     private static final String CREATE_TABLE_WIDGET_API = "CREATE TABLE " + TABLE_WIDGET_API + " ("

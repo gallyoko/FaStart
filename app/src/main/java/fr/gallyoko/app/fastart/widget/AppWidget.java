@@ -26,7 +26,7 @@ public class AppWidget extends AppWidgetProvider {
     private final static String EXTRA_FIRST_LAUNCH = "extraFirstLaunch";
     private boolean active = false;
     private boolean firstLaunch = true;
-    private String textButton = "ON";
+    private String textButton = "Titre";
     private Integer backgroundButton = R.mipmap.button_on;
 
     @Override
@@ -36,7 +36,7 @@ public class AppWidget extends AppWidgetProvider {
         final int length = appWidgetIds.length;
         for (int i = 0 ; i < length ; i++) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
-            views.setTextViewText(R.id.element, textButton);
+            views.setTextViewText(R.id.titleWidget, textButton);
             views.setImageViewResource(R.id.element, backgroundButton);
             views.setOnClickPendingIntent(R.id.element, buildButtonPendingIntent(context, appWidgetIds[i],
                     this.active, this.firstLaunch));
@@ -77,14 +77,12 @@ public class AppWidget extends AppWidgetProvider {
                     widgetRepository.open();
                     WidgetEntity widget = widgetRepository.getByAppWidgetId(widgetId);
                     widgetRepository.close();
-
+                    textButton = widget.getTitle();
                     if (extraActive) {
                         active = false;
-                        textButton = widget.getTextOn();
                         backgroundButton = widget.getType().getImageOn();
                     } else {
                         active = true;
-                        textButton = widget.getTextOff();
                         backgroundButton = widget.getType().getImageOff();
                     }
                     for (ApiEntity api: widget.getApis()) {
@@ -117,15 +115,14 @@ public class AppWidget extends AppWidgetProvider {
         WidgetEntity widget = widgetRepository.getByAppWidgetId(appWidgetId);
         if (widget != null) {
             if (widget.getInit()==0) {
-                textButton = widget.getTextOn();
+                textButton = widget.getTitle();
                 backgroundButton = widget.getType().getImageOn();
             }
             widget.setInit(1);
             widgetRepository.update(widget.getId(), widget);
             widgetRepository.close();
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
-            //views.setTextViewText(R.id.element, textButton);
-            //views.setInt(R.id.element, "setBackgroundColor", backgroundButton);
+            views.setTextViewText(R.id.titleWidget, textButton);
             views.setImageViewResource(R.id.element, backgroundButton);
             views.setOnClickPendingIntent(R.id.element, AppWidget.buildButtonPendingIntent(context, appWidgetId, active, firstLaunch));
             AppWidget.pushWidgetUpdate(context, views, appWidgetId);

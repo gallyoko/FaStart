@@ -7,24 +7,16 @@ public class WidgetEntity {
     private int id;
     private int appWidgetId;
     private String title;
-    private String textOn;
-    private ColorEntity colorOn;
-    private String textOff;
-    private ColorEntity colorOff;
     private WidgetTypeEntity type;
     private ArrayList<ApiEntity> apis = null;
     private int init;
 
     public WidgetEntity(){}
 
-    public WidgetEntity(int appWidgetId, String title, String textOn, ColorEntity colorOn, String textOff,
-                        ColorEntity colorOff, WidgetTypeEntity type, ArrayList<ApiEntity> apis, int init){
+    public WidgetEntity(int appWidgetId, String title, WidgetTypeEntity type,
+                        ArrayList<ApiEntity> apis, int init){
         this.appWidgetId = appWidgetId;
         this.title = title;
-        this.textOn = textOn;
-        this.colorOn = colorOn;
-        this.textOff = textOff;
-        this.colorOff = colorOff;
         this.type = type;
         this.apis = apis;
         this.init = init;
@@ -52,38 +44,6 @@ public class WidgetEntity {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getTextOn() {
-        return this.textOn;
-    }
-
-    public void setTextOn(String textOn) {
-        this.textOn = textOn;
-    }
-
-    public ColorEntity getColorOn() {
-        return this.colorOn;
-    }
-
-    public void setColorOn(ColorEntity colorOn) {
-        this.colorOn = colorOn;
-    }
-
-    public String getTextOff() {
-        return this.textOff;
-    }
-
-    public void setTextOff(String textOff) {
-        this.textOff = textOff;
-    }
-
-    public ColorEntity getColorOff() {
-        return this.colorOff;
-    }
-
-    public void setColorOff(ColorEntity colorOff) {
-        this.colorOff = colorOff;
     }
 
     public WidgetTypeEntity getType() {
