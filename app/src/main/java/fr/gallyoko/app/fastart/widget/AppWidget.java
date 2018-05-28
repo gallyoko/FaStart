@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.RemoteViews;
@@ -27,7 +26,7 @@ public class AppWidget extends AppWidgetProvider {
     private boolean active = false;
     private boolean firstLaunch = true;
     private String textButton = "Titre";
-    private Integer backgroundButton = R.mipmap.button_on;
+    private Integer backgroundButton = R.mipmap.button_on_1x1;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
