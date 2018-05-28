@@ -220,13 +220,17 @@ public class ConfigurationWidgetActivity extends Activity {
 
         WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(this);
         widgetTypeRepository.open();
-        if (widgetTypeRepository.getByName("button") == null) {
-            WidgetTypeEntity widgetTypeEntity1 = new WidgetTypeEntity("button", R.mipmap.button_on, R.mipmap.button_off);
+        if (widgetTypeRepository.getByName("Bouton") == null) {
+            WidgetTypeEntity widgetTypeEntity1 = new WidgetTypeEntity("Bouton", R.mipmap.button_on, R.mipmap.button_off);
             widgetTypeRepository.insert(widgetTypeEntity1);
         }
-        if (widgetTypeRepository.getByName("toggle") == null) {
-            WidgetTypeEntity widgetTypeEntity2 = new WidgetTypeEntity("toggle", R.mipmap.toggle_switch_off, R.mipmap.toggle_switch_on);
+        if (widgetTypeRepository.getByName("Switch") == null) {
+            WidgetTypeEntity widgetTypeEntity2 = new WidgetTypeEntity("Switch", R.mipmap.switch_off_1x1, R.mipmap.switch_on_1x1);
             widgetTypeRepository.insert(widgetTypeEntity2);
+        }
+        if (widgetTypeRepository.getByName("Ampoule") == null) {
+            WidgetTypeEntity widgetTypeEntity3 = new WidgetTypeEntity("Ampoule", R.mipmap.light_off_1x1, R.mipmap.light_on_1x1);
+            widgetTypeRepository.insert(widgetTypeEntity3);
         }
         widgetTypeRepository.close();
 
