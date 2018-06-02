@@ -10,8 +10,11 @@ import android.net.NetworkInfo;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
-import fr.gallyoko.app.fastart.service.FetchTask;
+import fr.gallyoko.app.fastart.service.Api;
+import fr.gallyoko.app.fastart.service.ApiResponse;
 import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
 import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
@@ -66,7 +69,7 @@ public class AppWidget extends AppWidgetProvider {
         if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
             Integer widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
             Boolean extraFirstLaunch = intent.getBooleanExtra(EXTRA_FIRST_LAUNCH, true);
-            Boolean extraActive = intent.getBooleanExtra(EXTRA_ACTIVE, false);
+            final Boolean extraActive = intent.getBooleanExtra(EXTRA_ACTIVE, false);
 
             if (!this.isConnected(context)) {
                 Toast.makeText(context, "Aucune connexion à internet.", Toast.LENGTH_SHORT).show();
@@ -84,20 +87,25 @@ public class AppWidget extends AppWidgetProvider {
                         active = true;
                         backgroundButton = widget.getType().getImageOff();
                     }
-                    for (ApiEntity api: widget.getApis()) {
+                    final Context apiContext = context;
+                    for (final ApiEntity api: widget.getApis()) {
+                        String url = "";
                         if (extraActive) {
-                            String url = api.getUrl() + api.getPutOff();
-                            FetchTask fetchTask = new FetchTask();
-                            fetchTask.context = context;
-                            fetchTask.messageSuccess = api.getPutOffMsg();
-                            fetchTask.execute(url);
+                            url = api.getUrl()+api.getPutOff();
                         } else {
-                            String url = api.getUrl() + api.getPutOn();
-                            FetchTask fetchTask = new FetchTask();
-                            fetchTask.context = context;
-                            fetchTask.messageSuccess = api.getPutOnMsg();
-                            fetchTask.execute(url);
+                            url = api.getUrl()+api.getPutOn();
                         }
+                        Api apiService = new Api(apiContext, url, "GET", "", new ApiResponse(){
+                            @Override
+                            public void getResponse(JSONObject output) {
+                                if (extraActive) {
+                                    Toast.makeText(apiContext, api.getPutOffMsg(), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(apiContext, api.getPutOnMsg(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                        apiService.exec();
                     }
                 }
                 firstLaunch = false;

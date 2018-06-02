@@ -11,5 +11,12 @@
         android:layout_height="93dp"
         android:text="FaStart est un ensemble de widget configurable" />
 
+    <Button
+        android:id="@+id/buttonTest"
+        android:text="Test"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        />
+
 
 </LinearLayout>

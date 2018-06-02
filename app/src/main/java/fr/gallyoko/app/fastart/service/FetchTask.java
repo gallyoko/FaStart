@@ -2,9 +2,8 @@ package fr.gallyoko.app.fastart.service;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.Toast;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -13,11 +12,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 
 public class FetchTask extends AsyncTask<String, Void, String> {
 
+    public AsyncResponse delegate = null;
     public Context context;
-    public String messageSuccess = "";
+    private String method = "GET";
+    private JSONObject result = null;
+
+    public FetchTask(AsyncResponse delegate){
+        this.delegate = delegate;
+    }
 
     @Override
     protected void onPreExecute() {
@@ -28,22 +35,39 @@ public class FetchTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... strings) {
         InputStream inputStream = null;
         HttpURLConnection conn = null;
-
-        String stringUrl = strings[0];
         try {
+            String stringUrl = strings[0];
             URL url = new URL(stringUrl);
             conn = (HttpURLConnection) url.openConnection();
-            conn.connect();
-            int response = conn.getResponseCode();
-            if (response != 200) {
-                return null;
+            this.method = strings[1];
+            if (!this.method.equals("GET")) {
+                conn.setDoOutput(true);
+                conn.setRequestMethod(this.method);
+                conn.setRequestProperty("Content-Type", "application/json");
+                if (!strings[2].equals("")) {
+                    conn.setDoInput(true);
+                    try {
+                        JSONObject postData = new JSONObject(strings[2]);
+                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+                        writer.write(postData.toString());
+                        writer.flush();
+                    } catch (JSONException e) {
+                        return null;
+                    } finally {
+                        //return null;
+                    }
+                }
             }
 
+            conn.connect();
+            int response = conn.getResponseCode();
+            if (response == 500) {
+                return null;
+            }
             inputStream = conn.getInputStream();
             if (inputStream == null) {
                 return null;
             }
-
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
             BufferedReader reader = new BufferedReader(inputStreamReader);
             StringBuffer buffer = new StringBuffer();
@@ -72,22 +96,14 @@ public class FetchTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        if (s == null) {
-            Log.i("Widget", "Erreur");
-            Toast.makeText(context, "Erreur " + this.messageSuccess, Toast.LENGTH_SHORT).show();
-        } else {
-            Log.i("Widget", s);
-            String message = this.messageSuccess;
+        JSONObject jObject = null;
+        if (s != null) {
             try {
-                JSONObject jObject = new JSONObject(s);
-                boolean aJsonBoolean = jObject.getBoolean("success");
-                if (!aJsonBoolean) {
-                    message = "Erreur lors de l'action";
-                }
-            } catch (Exception e) {
-                message = "Erreur de parsing";
+                jObject = new JSONObject(s);
+            } catch (JSONException e) {
+                jObject = null;
             } finally {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                delegate.processFinish(jObject);
             }
         }
     }
