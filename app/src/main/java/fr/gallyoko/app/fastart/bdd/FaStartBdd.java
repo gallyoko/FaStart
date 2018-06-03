@@ -19,6 +19,11 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private static final String WIDGET_API_COL_WIDGET = "widget_id";
     private static final String WIDGET_API_COL_API = "api_id";
 
+    private static final String TABLE_WIDGET_FREEBOX_API = "widget_freebox_api";
+    private static final String WIDGET_FREEBOX_API_COL_ID = "id";
+    private static final String WIDGET_FREEBOX_API_COL_WIDGET = "widget_id";
+    private static final String WIDGET_FREEBOX_API_COL_API_FREEBOX = "api_freebox_id";
+
     private static final String TABLE_WIDGET_TYPE = "widget_type";
     private static final String WIDGET_TYPE_COL_ID = "id";
     private static final String WIDGET_TYPE_COL_NAME = "name";
@@ -45,6 +50,15 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private static final String API_COL_PUT_OFF = "put_off";
     private static final String API_COL_PUT_OFF_MSG = "put_off_msg";
 
+    private static final String TABLE_FREEBOX_API = "freebox_api";
+    private static final String FREEBOX_API_COL_ID = "id";
+    private static final String FREEBOX_API_COL_NAME = "name";
+    private static final String FREEBOX_API_COL_DESCRIPTION = "description";
+    private static final String FREEBOX_API_COL_METHOD_ON = "method_on";
+    private static final String FREEBOX_API_COL_ON_MSG = "on_msg";
+    private static final String FREEBOX_API_COL_METHOD_OFF = "method_off";
+    private static final String FREEBOX_API_COL_OFF_MSG = "off_msg";
+
     private static final String CREATE_TABLE_WIDGET = "CREATE TABLE " + TABLE_WIDGET + " ("
             + WIDGET_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_COL_APP_WIDGET_ID + " INTEGER NOT NULL, "
             + WIDGET_COL_TITLE + " TEXT NOT NULL, " + WIDGET_COL_TYPE + " INTEGER NOT NULL, "
@@ -52,6 +66,9 @@ public class FaStartBdd extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_WIDGET_API = "CREATE TABLE " + TABLE_WIDGET_API + " ("
             + WIDGET_API_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_API_COL_WIDGET + " INTEGER NOT NULL, " + WIDGET_API_COL_API + " INTEGER NOT NULL);";
+
+    private static final String CREATE_TABLE_WIDGET_FREEBOX_API = "CREATE TABLE " + TABLE_WIDGET_FREEBOX_API + " ("
+            + WIDGET_FREEBOX_API_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_FREEBOX_API_COL_WIDGET + " INTEGER NOT NULL, " + WIDGET_FREEBOX_API_COL_API_FREEBOX + " INTEGER NOT NULL);";
 
     private static final String CREATE_TABLE_WIDGET_TYPE = "CREATE TABLE " + TABLE_WIDGET_TYPE + " ("
             + WIDGET_TYPE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + WIDGET_TYPE_COL_NAME + " TEXT NOT NULL, " + WIDGET_TYPE_COL_IMG_ON + " INTEGER NOT NULL, "
@@ -69,6 +86,12 @@ public class FaStartBdd extends SQLiteOpenHelper {
             + API_COL_PUT_ON + " TEXT NOT NULL, " + API_COL_PUT_ON_MSG + " TEXT NOT NULL, "
             + API_COL_PUT_OFF + " TEXT NOT NULL, " + API_COL_PUT_OFF_MSG + " TEXT NOT NULL);";
 
+    private static final String CREATE_TABLE_FREEBOX_API = "CREATE TABLE " + TABLE_FREEBOX_API + " ("
+            + FREEBOX_API_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + FREEBOX_API_COL_NAME + " TEXT NOT NULL, "
+            + FREEBOX_API_COL_DESCRIPTION + " TEXT NOT NULL, " + FREEBOX_API_COL_METHOD_ON + " TEXT NOT NULL, "
+            + FREEBOX_API_COL_ON_MSG + " TEXT NOT NULL, " + FREEBOX_API_COL_METHOD_OFF + " TEXT NOT NULL, "
+            + FREEBOX_API_COL_OFF_MSG + " TEXT NOT NULL);";
+
     public FaStartBdd(Context context, String name, CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -78,6 +101,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
         this.dropTableConfig(db);
         db.execSQL(CREATE_TABLE_WIDGET);
         db.execSQL(CREATE_TABLE_WIDGET_API);
+        db.execSQL(CREATE_TABLE_WIDGET_FREEBOX_API);
         this.createTableConfig(db);
     }
 
@@ -93,6 +117,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
         try {
             db.execSQL(CREATE_TABLE_WIDGET_TYPE);
             db.execSQL(CREATE_TABLE_API);
+            db.execSQL(CREATE_TABLE_FREEBOX_API);
             db.execSQL(CREATE_TABLE_COLOR);
             db.execSQL(CREATE_TABLE_CONFIG);
         } catch (Exception ex) {
@@ -103,6 +128,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private void dropTableConfig(SQLiteDatabase db) {
         try {
             db.execSQL("DROP TABLE " + TABLE_API + ";");
+            db.execSQL("DROP TABLE " + TABLE_FREEBOX_API + ";");
             db.execSQL("DROP TABLE " + TABLE_WIDGET_TYPE + ";");
             db.execSQL("DROP TABLE " + TABLE_COLOR + ";");
             db.execSQL("DROP TABLE " + TABLE_CONFIG + ";");

@@ -9,16 +9,19 @@ public class WidgetEntity {
     private String title;
     private WidgetTypeEntity type;
     private ArrayList<ApiEntity> apis = null;
+    private ArrayList<FreeboxApiEntity> freeboxApis = null;
     private int init;
 
     public WidgetEntity(){}
 
     public WidgetEntity(int appWidgetId, String title, WidgetTypeEntity type,
-                        ArrayList<ApiEntity> apis, int init){
+                        ArrayList<ApiEntity> apis, ArrayList<FreeboxApiEntity> freeboxApis,
+                        int init){
         this.appWidgetId = appWidgetId;
         this.title = title;
         this.type = type;
         this.apis = apis;
+        this.freeboxApis = freeboxApis;
         this.init = init;
     }
 
@@ -60,6 +63,14 @@ public class WidgetEntity {
 
     public void setApis(ArrayList<ApiEntity> apis) {
         this.apis = apis;
+    }
+
+    public ArrayList<FreeboxApiEntity> getFreeboxApis() {
+        return freeboxApis;
+    }
+
+    public void setFreeboxApis(ArrayList<FreeboxApiEntity> freeboxApis) {
+        this.freeboxApis = freeboxApis;
     }
 
     public int getInit() {

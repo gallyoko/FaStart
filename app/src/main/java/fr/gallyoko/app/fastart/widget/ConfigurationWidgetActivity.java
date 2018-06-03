@@ -17,11 +17,13 @@ import java.util.ArrayList;
 
 import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
+import fr.gallyoko.app.fastart.bdd.entity.FreeboxApiEntity;
 import fr.gallyoko.app.fastart.bdd.entity.ColorEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetTypeEntity;
 import fr.gallyoko.app.fastart.bdd.entity.ConfigEntity;
 import fr.gallyoko.app.fastart.bdd.repository.ApiRepository;
+import fr.gallyoko.app.fastart.bdd.repository.FreeboxApiRepository;
 import fr.gallyoko.app.fastart.bdd.repository.ColorRepository;
 import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
 import fr.gallyoko.app.fastart.bdd.repository.WidgetTypeRepository;
@@ -34,8 +36,10 @@ public class ConfigurationWidgetActivity extends Activity {
     private int typePositionSelect = -1;
     private int api1PositionSelect = -1;
     private int api2PositionSelect = -1;
+    private int freeboxApiPositionSelect = -1;
     private ArrayList<WidgetTypeEntity> widgetTypes = null;
     private ArrayList<ApiEntity> apis = null;
+    private ArrayList<FreeboxApiEntity> freeboxApis = null;
     private EditText title = null;
 
     @Override
@@ -62,6 +66,7 @@ public class ConfigurationWidgetActivity extends Activity {
 
         this.initViewType();
         this.initViewApi();
+        this.initViewFreeboxApi();
 
         this.title = findViewById(R.id.titleWidget);
 
@@ -163,10 +168,43 @@ public class ConfigurationWidgetActivity extends Activity {
         });
     }
 
+    private void initViewFreeboxApi() {
+        Spinner dropdownFreeboxApi = findViewById(R.id.freeboxApi);
+
+        FreeboxApiRepository freeboxApiRepository = new FreeboxApiRepository(this);
+        freeboxApiRepository.open();
+        this.freeboxApis = freeboxApiRepository.getAll();
+        freeboxApiRepository.close();
+
+        String[] itemsFreeboxApi = new String[freeboxApis.size()+1];
+        itemsFreeboxApi[0] = "Select action ...";
+        int indexFreeboxApi = 1;
+        for (FreeboxApiEntity freeboxApi: freeboxApis) {
+            itemsFreeboxApi[indexFreeboxApi] = freeboxApi.getName();
+            indexFreeboxApi ++;
+        }
+
+        ArrayAdapter<String> adapterFreeboxApi = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, itemsFreeboxApi);
+        dropdownFreeboxApi.setAdapter(adapterFreeboxApi);
+
+        dropdownFreeboxApi.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position >= 0) {
+                    freeboxApiPositionSelect = position;
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                freeboxApiPositionSelect = -1;
+            }
+        });
+    }
+
     private void saveWidget() {
-        Freebox freebox = new Freebox(this);
-        freebox.authFreebox();
-        /*final Intent resultValue = new Intent();
+        //Freebox freebox = new Freebox(this);
+        //freebox.authFreebox();
+        final Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
         WidgetRepository widgetRepository = new WidgetRepository(this);
         widgetRepository.open();
@@ -175,7 +213,7 @@ public class ConfigurationWidgetActivity extends Activity {
             try {
                 if (this.typePositionSelect <= 0) {
                     throw new Exception("Veuillez sélectionner un type.");
-                } else if (this.api1PositionSelect <= 0 && this.api2PositionSelect <= 0) {
+                } else if (this.api1PositionSelect <= 0 && this.api2PositionSelect <= 0 && this.freeboxApiPositionSelect <= 0) {
                     throw new Exception("Veuillez sélectionner une action.");
                 } else if (title.getText().toString().equals("")) {
                     throw new Exception("Veuillez saisir un titre.");
@@ -185,21 +223,33 @@ public class ConfigurationWidgetActivity extends Activity {
                 WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(widgetTypes.get(this.typePositionSelect-1).getId());
                 widgetTypeRepository.close();
 
-                ArrayList<ApiEntity> apisToSave = new ArrayList();
-                ApiRepository apiRepository = new ApiRepository(this);
-                apiRepository.open();
-                if (this.api1PositionSelect > 0) {
-                    ApiEntity apiEntity1 = apiRepository.getById(apis.get(this.api1PositionSelect-1).getId());
-                    apisToSave.add(apiEntity1);
+                ArrayList<ApiEntity> apisToSave = null;
+                ArrayList<FreeboxApiEntity> freeboxApisToSave = null;
+                if (this.freeboxApiPositionSelect > 0) {
+                    freeboxApisToSave = new ArrayList();
+                    FreeboxApiRepository freeboxApiRepository = new FreeboxApiRepository(this);
+                    freeboxApiRepository.open();
+                    FreeboxApiEntity freeboxApiEntity = freeboxApiRepository.getById(freeboxApis.get(this.freeboxApiPositionSelect-1).getId());
+                    freeboxApisToSave.add(freeboxApiEntity);
+                    freeboxApiRepository.close();
+                } else {
+                    apisToSave = new ArrayList();
+                    ApiRepository apiRepository = new ApiRepository(this);
+                    apiRepository.open();
+                    if (this.api1PositionSelect > 0) {
+                        ApiEntity apiEntity1 = apiRepository.getById(apis.get(this.api1PositionSelect-1).getId());
+                        apisToSave.add(apiEntity1);
+                    }
+                    if (this.api2PositionSelect > 0) {
+                        ApiEntity apiEntity2 = apiRepository.getById(apis.get(this.api2PositionSelect-1).getId());
+                        apisToSave.add(apiEntity2);
+                    }
+                    apiRepository.close();
                 }
-                if (this.api2PositionSelect > 0) {
-                    ApiEntity apiEntity2 = apiRepository.getById(apis.get(this.api2PositionSelect-1).getId());
-                    apisToSave.add(apiEntity2);
-                }
-                apiRepository.close();
+
 
                 WidgetEntity widgetEntity = new WidgetEntity(mAppWidgetId,
-                        title.getText().toString(), widgetTypeEntity, apisToSave, 0);
+                        title.getText().toString(), widgetTypeEntity, apisToSave, freeboxApisToSave, 0);
                 widgetRepository.insert(widgetEntity);
                 widgetRepository.close();
             } catch (Exception ex) {
@@ -216,7 +266,7 @@ public class ConfigurationWidgetActivity extends Activity {
                     finish();
                 }
             }
-        }*/
+        }
     }
 
     private void updateConfig() {
@@ -256,6 +306,17 @@ public class ConfigurationWidgetActivity extends Activity {
             apiRepository.insert(apiEntity);
         }
         apiRepository.close();
+
+        FreeboxApiRepository freeboxApiRepository = new FreeboxApiRepository(this);
+        freeboxApiRepository.open();
+        if (freeboxApiRepository.getByName("playlist freebox") == null) {
+            FreeboxApiEntity freeboxApiEntity = new FreeboxApiEntity("playlist freebox",
+                    "Lance une playlist sur la Freebox",
+                    "startAirMedia", "Lancement de la playlist sur la Freebox...", "stopAirMedia",
+                    "Arrêt de la playlist sur la Freebox...");
+            freeboxApiRepository.insert(freeboxApiEntity);
+        }
+        freeboxApiRepository.close();
 
         ConfigRepository configRepository = new ConfigRepository(this);
         configRepository.open();

@@ -65,6 +65,21 @@
         android:background="@android:drawable/btn_dropdown"
         android:spinnerMode="dropdown" />
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Action Freebox : "
+        android:textColor="#FF0000"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/freeboxApi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

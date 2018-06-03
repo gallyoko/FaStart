@@ -9,10 +9,11 @@ import java.util.ArrayList;
 
 import fr.gallyoko.app.fastart.bdd.FaStartBdd;
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
+import fr.gallyoko.app.fastart.bdd.entity.FreeboxApiEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetApiEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetTypeEntity;
-import fr.gallyoko.app.fastart.bdd.entity.ColorEntity;
+import fr.gallyoko.app.fastart.bdd.entity.WidgetFreeboxApiEntity;
 
 public class WidgetRepository {
 
@@ -63,14 +64,24 @@ public class WidgetRepository {
         values.put(COL_INIT, widget.getInit());
         long widgetId = bdd.insert(TABLE_NAME, null, values);
         widget.setId(((int) widgetId));
-        WidgetApiRepository widgetApiRepository = new WidgetApiRepository(this.context);
-        widgetApiRepository.open();
-        for (ApiEntity api: widget.getApis()) {
-            WidgetApiEntity widgetApiEntity = new WidgetApiEntity(widget, api);
-            widgetApiRepository.insert(widgetApiEntity);
+        if (widget.getApis() != null) {
+            WidgetApiRepository widgetApiRepository = new WidgetApiRepository(this.context);
+            widgetApiRepository.open();
+            for (ApiEntity api: widget.getApis()) {
+                WidgetApiEntity widgetApiEntity = new WidgetApiEntity(widget, api);
+                widgetApiRepository.insert(widgetApiEntity);
+            }
+            widgetApiRepository.close();
         }
-        widgetApiRepository.close();
-
+        if (widget.getFreeboxApis() != null) {
+            WidgetFreeboxApiRepository widgetFreeboxApiRepository = new WidgetFreeboxApiRepository(this.context);
+            widgetFreeboxApiRepository.open();
+            for (FreeboxApiEntity apiFreebox: widget.getFreeboxApis()) {
+                WidgetFreeboxApiEntity widgetFreeboxApiEntity = new WidgetFreeboxApiEntity(widget, apiFreebox);
+                widgetFreeboxApiRepository.insert(widgetFreeboxApiEntity);
+            }
+            widgetFreeboxApiRepository.close();
+        }
         return widgetId;
     }
 
@@ -123,7 +134,18 @@ public class WidgetRepository {
         WidgetApiRepository widgetApiRepository = new WidgetApiRepository(this.context);
         widgetApiRepository.open();
         ArrayList<ApiEntity> apis = widgetApiRepository.getApiByWidget(widget);
-        widget.setApis(apis);
+        if (apis != null) {
+            widget.setApis(apis);
+        }
+        widgetApiRepository.close();
+
+        WidgetFreeboxApiRepository widgetFreeboxApiRepository = new WidgetFreeboxApiRepository(this.context);
+        widgetFreeboxApiRepository.open();
+        ArrayList<FreeboxApiEntity> freeboxApis = widgetFreeboxApiRepository.getApiByWidget(widget);
+        if (freeboxApis != null) {
+            widget.setFreeboxApis(freeboxApis);
+        }
+        widgetFreeboxApiRepository.close();
 
         widget.setInit(c.getInt(NUM_COL_INIT));
         //On ferme le cursor
@@ -141,6 +163,8 @@ public class WidgetRepository {
         widgetTypeRepository.open();
         WidgetApiRepository widgetApiRepository = new WidgetApiRepository(this.context);
         widgetApiRepository.open();
+        WidgetFreeboxApiRepository widgetFreeboxApiRepository = new WidgetFreeboxApiRepository(this.context);
+        widgetFreeboxApiRepository.open();
         //Sinon on se place sur le premier élément
         if (c.moveToFirst()) {
             do {
@@ -151,7 +175,13 @@ public class WidgetRepository {
                 WidgetTypeEntity widgetTypeEntity = widgetTypeRepository.getById(c.getInt(NUM_COL_TYPE));
                 widget.setType(widgetTypeEntity);
                 ArrayList<ApiEntity> apis = widgetApiRepository.getApiByWidget(widget);
-                widget.setApis(apis);
+                if (apis != null) {
+                    widget.setApis(apis);
+                }
+                ArrayList<FreeboxApiEntity> freeboxApis = widgetFreeboxApiRepository.getApiByWidget(widget);
+                if (freeboxApis != null) {
+                    widget.setFreeboxApis(freeboxApis);
+                }
                 widget.setInit(c.getInt(NUM_COL_INIT));
                 widgets.add(widget);
             } while (c.moveToNext());
@@ -159,6 +189,7 @@ public class WidgetRepository {
         c.close();
         widgetTypeRepository.close();
         widgetApiRepository.close();
+        widgetFreeboxApiRepository.close();
 
         return widgets;
     }
