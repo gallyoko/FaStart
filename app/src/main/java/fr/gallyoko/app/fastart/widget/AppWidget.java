@@ -28,7 +28,7 @@ public class AppWidget extends AppWidgetProvider {
     private final static String EXTRA_FIRST_LAUNCH = "extraFirstLaunch";
     private boolean active = false;
     private boolean firstLaunch = true;
-    private String textButton = "Titre";
+    private String textButton = "";
     private Integer backgroundButton = R.mipmap.button_on_1x1;
 
     @Override
@@ -36,14 +36,22 @@ public class AppWidget extends AppWidgetProvider {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
         final int length = appWidgetIds.length;
+        WidgetRepository widgetRepository = new WidgetRepository(context);
+        widgetRepository.open();
         for (int i = 0 ; i < length ; i++) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_button);
+            WidgetEntity widget = widgetRepository.getByAppWidgetId(appWidgetIds[i]);
+            if (widget != null) {
+                textButton = widget.getTitle();
+                backgroundButton = widget.getType().getImageOn();
+            }
             views.setTextViewText(R.id.titleWidget, textButton);
             views.setImageViewResource(R.id.element, backgroundButton);
             views.setOnClickPendingIntent(R.id.element, buildButtonPendingIntent(context, appWidgetIds[i],
                     this.active, this.firstLaunch));
             pushWidgetUpdate(context, views, appWidgetIds[i]);
         }
+        widgetRepository.close();
     }
 
     public static void pushWidgetUpdate(Context context, RemoteViews remoteViews, int appWidgetId) {

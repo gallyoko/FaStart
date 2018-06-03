@@ -30,6 +30,11 @@ public class FaStartBdd extends SQLiteOpenHelper {
     private static final String COLOR_COL_NAME = "name";
     private static final String COLOR_COL_VALUE = "value";
 
+    private static final String TABLE_CONFIG = "config";
+    private static final String CONFIG_COL_ID = "id";
+    private static final String CONFIG_COL_CODE = "code";
+    private static final String CONFIG_COL_VALUE = "value";
+
     private static final String TABLE_API = "api";
     private static final String API_COL_ID = "id";
     private static final String API_COL_NAME = "name";
@@ -54,6 +59,9 @@ public class FaStartBdd extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_COLOR = "CREATE TABLE " + TABLE_COLOR + " ("
             + COLOR_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLOR_COL_NAME + " TEXT NOT NULL, " + COLOR_COL_VALUE + " INTEGER NOT NULL);";
+
+    private static final String CREATE_TABLE_CONFIG = "CREATE TABLE " + TABLE_CONFIG + " ("
+            + CONFIG_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + CONFIG_COL_CODE + " TEXT NOT NULL, " + CONFIG_COL_VALUE + " TEXT NOT NULL);";
 
     private static final String CREATE_TABLE_API = "CREATE TABLE " + TABLE_API + " ("
             + API_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + API_COL_NAME + " TEXT NOT NULL, "
@@ -86,6 +94,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_WIDGET_TYPE);
             db.execSQL(CREATE_TABLE_API);
             db.execSQL(CREATE_TABLE_COLOR);
+            db.execSQL(CREATE_TABLE_CONFIG);
         } catch (Exception ex) {
             // todo
         }
@@ -96,6 +105,7 @@ public class FaStartBdd extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE " + TABLE_API + ";");
             db.execSQL("DROP TABLE " + TABLE_WIDGET_TYPE + ";");
             db.execSQL("DROP TABLE " + TABLE_COLOR + ";");
+            db.execSQL("DROP TABLE " + TABLE_CONFIG + ";");
         } catch (Exception ex) {
             // todo
         }

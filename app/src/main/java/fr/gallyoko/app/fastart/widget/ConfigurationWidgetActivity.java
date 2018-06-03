@@ -1,10 +1,12 @@
 package fr.gallyoko.app.fastart.widget;
 
 import android.app.Activity;
+import android.content.Context;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -14,16 +16,21 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
 import fr.gallyoko.app.fastart.bdd.entity.ColorEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetEntity;
 import fr.gallyoko.app.fastart.bdd.entity.WidgetTypeEntity;
+import fr.gallyoko.app.fastart.bdd.entity.ConfigEntity;
 import fr.gallyoko.app.fastart.bdd.repository.ApiRepository;
 import fr.gallyoko.app.fastart.bdd.repository.ColorRepository;
 import fr.gallyoko.app.fastart.bdd.repository.WidgetRepository;
 import fr.gallyoko.app.fastart.bdd.repository.WidgetTypeRepository;
+import fr.gallyoko.app.fastart.bdd.repository.ConfigRepository;
+import fr.gallyoko.app.fastart.service.Freebox;
 
 public class ConfigurationWidgetActivity extends Activity {
 
@@ -34,6 +41,9 @@ public class ConfigurationWidgetActivity extends Activity {
     private ArrayList<WidgetTypeEntity> widgetTypes = null;
     private ArrayList<ApiEntity> apis = null;
     private EditText title = null;
+    private Timer timerTrackId;
+    private TimerTask timerTaskTrackId;
+    private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +171,8 @@ public class ConfigurationWidgetActivity extends Activity {
     }
 
     private void saveWidget() {
+        //Freebox freebox = new Freebox(this);
+        //freebox.authFreebox();
         final Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
         WidgetRepository widgetRepository = new WidgetRepository(this);
@@ -215,8 +227,8 @@ public class ConfigurationWidgetActivity extends Activity {
     }
 
     private void updateConfig() {
-        String urlDev = "http://172.20.0.2:8091";
-        //String urlProd = "http://83.157.150.119:9394";
+        //String urlDev = "http://172.20.0.2:8091";
+        String urlProd = "http://83.157.150.119:9394";
 
         WidgetTypeRepository widgetTypeRepository = new WidgetTypeRepository(this);
         widgetTypeRepository.open();
@@ -239,18 +251,26 @@ public class ConfigurationWidgetActivity extends Activity {
         if (apiRepository.getByName("lumière salon") == null) {
             ApiEntity apiEntity = new ApiEntity("lumière salon",
                     "Allume ou éteind l'halogène du salon",
-                    urlDev + "/api/light", "/put/on/1", "Lumière salon allumée.",
+                    urlProd + "/api/light", "/put/on/1", "Lumière salon allumée.",
                     "/put/off/1", "Lumière salon éteinte.");
             apiRepository.insert(apiEntity);
         }
         if (apiRepository.getByName("lumière TV") == null) {
             ApiEntity apiEntity = new ApiEntity("lumière TV",
                     "Allume ou éteind la petite lumière TV du salon",
-                    urlDev + "/api/light", "/put/on/2", "Lumière TV allumée.",
+                    urlProd + "/api/light", "/put/on/2", "Lumière TV allumée.",
                     "/put/off/2", "Lumière TV éteinte.");
             apiRepository.insert(apiEntity);
         }
         apiRepository.close();
+
+        ConfigRepository configRepository = new ConfigRepository(this);
+        configRepository.open();
+        if (configRepository.getByCode("FREEBOX_STATUS") == null) {
+            ConfigEntity configEntity = new ConfigEntity("FREEBOX_STATUS", "restricted");
+            configRepository.insert(configEntity);
+        }
+        configRepository.close();
 
         ColorRepository colorRepository = new ColorRepository(this);
         colorRepository.open();
