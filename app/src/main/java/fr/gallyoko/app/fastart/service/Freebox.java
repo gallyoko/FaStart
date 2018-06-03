@@ -36,6 +36,7 @@ public class Freebox {
     private String routeLogin = "";
     private String routeLoginSession = "";
     private String routeAirMediaConfig = "";
+    private String routeAirMedia = "";
 
     public Freebox(Context context) {
         this.context = context;
@@ -54,6 +55,7 @@ public class Freebox {
             this.routeLogin = "/login";
             this.routeLoginSession = "/login/session";
             this.routeAirMediaConfig = "/airmedia/config/";
+            this.routeAirMedia = "/airmedia/receivers/Freebox%20Player/";
         } else {
             this.urlApi = "http://172.20.0.2:8091";
             //this.urlApi = "http://83.157.150.119:9394";
@@ -235,21 +237,8 @@ public class Freebox {
 
     public void getAirMediaConfig() {
         final Context context = this.context;
-        ConfigRepository configRepository = new ConfigRepository(context);
-        configRepository.open();
-        if (configRepository.getByCode("FREEBOX_SESSION_TOKEN")!=null) {
-            ConfigEntity configEntity = configRepository.getByCode("FREEBOX_SESSION_TOKEN");
-            String tokenSession = configEntity.getValue();
-            configRepository.close();
-            ArrayList<ContentTypeEntity> contentTypes = new ArrayList<>();
-            ContentTypeEntity contentTypeEntity1 = new ContentTypeEntity();
-            contentTypeEntity1.setName("CONTENT_TYPE");
-            contentTypeEntity1.setValue("application/x-www-form-urlencoded");
-            contentTypes.add(contentTypeEntity1);
-            ContentTypeEntity contentTypeEntity2 = new ContentTypeEntity();
-            contentTypeEntity2.setName("FREEBOX_APP_AUTH");
-            contentTypeEntity2.setValue(tokenSession);
-            contentTypes.add(contentTypeEntity2);
+        ArrayList<ContentTypeEntity> contentTypes = this.getContentType();
+        if (contentTypes != null) {
             Api apiService = new Api(context,
                     this.urlApi + this.routeAirMediaConfig,
                     "GET", "", contentTypes,
@@ -282,6 +271,97 @@ public class Freebox {
             apiService.exec();
         } else {
             Toast.makeText(context, "Erreur de token", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void startAirMedia() {
+        final Context context = this.context;
+        ArrayList<ContentTypeEntity> contentTypes = this.getContentType();
+        if (contentTypes != null) {
+            Api apiService = new Api(context,
+                    this.urlApi + this.routeAirMedia,
+                    "POST",
+                    "{'action': 'start','media_type': 'video','media': 'http://anon.nasa-global.edgesuite.net/HD_downloads/GRAIL_launch_480.mov'}", contentTypes,
+                    new ApiResponse(){
+                        @Override
+                        public void getResponse(JSONObject output) {
+                            String message = "";
+                            try {
+                                Log.i("LAUNCH_MEDIA", output.toString());
+                                if (output.getBoolean("success")) {
+                                    message = "Lancement du média sur la Freebox en cours...";
+                                } else {
+                                    message = "Erreur lors du lancement du média sur la Freebox";
+                                }
+                            } catch (Exception e) {
+                                message = "Erreur de parsing de startAirMedia";
+                            } finally {
+                                if (!message.equals("")) {
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        }
+                    });
+            apiService.exec();
+        } else {
+            Toast.makeText(context, "Erreur de token", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void stopAirMedia() {
+        final Context context = this.context;
+        ArrayList<ContentTypeEntity> contentTypes = this.getContentType();
+        if (contentTypes != null) {
+            Api apiService = new Api(context,
+                    this.urlApi + this.routeAirMedia,
+                    "POST",
+                    "{'action': 'stop','media_type': 'video'}", contentTypes,
+                    new ApiResponse(){
+                        @Override
+                        public void getResponse(JSONObject output) {
+                            String message = "";
+                            try {
+                                if (output.getBoolean("success")) {
+                                    message = "Arrêt du média sur la Freebox en cours...";
+                                } else {
+                                    message = "Erreur lors de l'arrêt du média sur la Freebox";
+                                }
+                            } catch (Exception e) {
+                                message = "Erreur de parsing de stopAirMedia";
+                            } finally {
+                                if (!message.equals("")) {
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        }
+                    });
+            apiService.exec();
+        } else {
+            Toast.makeText(context, "Erreur de token", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private ArrayList<ContentTypeEntity> getContentType() {
+        ConfigRepository configRepository = new ConfigRepository(context);
+        configRepository.open();
+        if (configRepository.getByCode("FREEBOX_SESSION_TOKEN")!=null) {
+            ConfigEntity configEntity = configRepository.getByCode("FREEBOX_SESSION_TOKEN");
+            String tokenSession = configEntity.getValue();
+            configRepository.close();
+            ArrayList<ContentTypeEntity> contentTypes = new ArrayList<>();
+            ContentTypeEntity contentTypeEntity1 = new ContentTypeEntity();
+            contentTypeEntity1.setName("CONTENT_TYPE");
+            contentTypeEntity1.setValue("application/x-www-form-urlencoded");
+            contentTypes.add(contentTypeEntity1);
+            ContentTypeEntity contentTypeEntity2 = new ContentTypeEntity();
+            contentTypeEntity2.setName("FREEBOX_APP_AUTH");
+            contentTypeEntity2.setValue(tokenSession);
+            contentTypes.add(contentTypeEntity2);
+            return contentTypes;
+        } else {
+            return null;
         }
     }
 

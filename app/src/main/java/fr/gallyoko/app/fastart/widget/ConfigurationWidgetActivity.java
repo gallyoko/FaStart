@@ -164,9 +164,9 @@ public class ConfigurationWidgetActivity extends Activity {
     }
 
     private void saveWidget() {
-        //Freebox freebox = new Freebox(this);
-        //freebox.authFreebox();
-        final Intent resultValue = new Intent();
+        Freebox freebox = new Freebox(this);
+        freebox.authFreebox();
+        /*final Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
         WidgetRepository widgetRepository = new WidgetRepository(this);
         widgetRepository.open();
@@ -216,7 +216,7 @@ public class ConfigurationWidgetActivity extends Activity {
                     finish();
                 }
             }
-        }
+        }*/
     }
 
     private void updateConfig() {

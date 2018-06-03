@@ -33,9 +33,18 @@ public class MainActivity extends Activity {
                 });
                 apiService.exec();*/
                 Freebox freebox = new Freebox(MainActivity.this);
-                freebox.getAirMediaConfig();
+                freebox.startAirMedia();
             }
         });
+
+        findViewById(R.id.buttonTest2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Freebox freebox = new Freebox(MainActivity.this);
+                freebox.stopAirMedia();
+            }
+        });
+
 
     }
 }
