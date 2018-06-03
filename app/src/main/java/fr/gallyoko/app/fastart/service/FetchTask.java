@@ -36,14 +36,29 @@ public class FetchTask extends AsyncTask<String, Void, String> {
         InputStream inputStream = null;
         HttpURLConnection conn = null;
         try {
+            boolean isSetContentType = false;
             String stringUrl = strings[0];
             URL url = new URL(stringUrl);
             conn = (HttpURLConnection) url.openConnection();
             this.method = strings[1];
+            if (!strings[3].equals("") && !strings[3].equals("null") && !strings[3].equals("{}")) {
+                try {
+                    JSONObject headers = new JSONObject(strings[3]);
+                    conn.setRequestProperty("Content-Type", headers.getString("CONTENT_TYPE"));
+                    conn.setRequestProperty("X-Fbx-App-Auth", headers.getString("FREEBOX_APP_AUTH"));
+                    isSetContentType = true;
+                } catch (JSONException e) {
+                    return null;
+                } finally {
+                    //return null;
+                }
+            }
             if (!this.method.equals("GET")) {
                 conn.setDoOutput(true);
                 conn.setRequestMethod(this.method);
-                conn.setRequestProperty("Content-Type", "application/json");
+                if (!isSetContentType) {
+                    conn.setRequestProperty("Content-Type", "application/json");
+                }
                 if (!strings[2].equals("")) {
                     conn.setDoInput(true);
                     try {

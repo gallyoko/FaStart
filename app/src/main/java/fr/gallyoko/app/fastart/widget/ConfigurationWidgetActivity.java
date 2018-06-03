@@ -1,12 +1,10 @@
 package fr.gallyoko.app.fastart.widget;
 
 import android.app.Activity;
-import android.content.Context;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -16,8 +14,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import fr.gallyoko.app.fastart.R;
 import fr.gallyoko.app.fastart.bdd.entity.ApiEntity;
@@ -41,9 +37,6 @@ public class ConfigurationWidgetActivity extends Activity {
     private ArrayList<WidgetTypeEntity> widgetTypes = null;
     private ArrayList<ApiEntity> apis = null;
     private EditText title = null;
-    private Timer timerTrackId;
-    private TimerTask timerTaskTrackId;
-    private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

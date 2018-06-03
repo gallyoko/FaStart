@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import android.util.Log;
 import fr.gallyoko.app.fastart.service.ApiResponse;
 import fr.gallyoko.app.fastart.service.Api;
+import fr.gallyoko.app.fastart.service.Freebox;
 
 public class MainActivity extends Activity {
 
@@ -20,9 +21,9 @@ public class MainActivity extends Activity {
         findViewById(R.id.buttonTest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Api apiService = new Api(MainActivity.this,
+                /*Api apiService = new Api(MainActivity.this,
                         "http://172.20.0.2:8091/api/light/test",
-                        "POST", "{'test': 'ok test'}",
+                        "POST", "{'test': 'ok test'}", null,
                         new ApiResponse() {
                             @Override
                             public void getResponse(JSONObject output) {
@@ -30,7 +31,9 @@ public class MainActivity extends Activity {
                                 Log.i("RESULT RETURN", output.toString());
                             }
                 });
-                apiService.exec();
+                apiService.exec();*/
+                Freebox freebox = new Freebox(MainActivity.this);
+                freebox.getAirMediaConfig();
             }
         });
 

@@ -103,7 +103,7 @@ public class AppWidget extends AppWidgetProvider {
                         } else {
                             url = api.getUrl()+api.getPutOn();
                         }
-                        Api apiService = new Api(apiContext, url, "GET", "", new ApiResponse(){
+                        Api apiService = new Api(apiContext, url, "GET", "", null, new ApiResponse(){
                             @Override
                             public void getResponse(JSONObject output) {
                                 if (extraActive) {
